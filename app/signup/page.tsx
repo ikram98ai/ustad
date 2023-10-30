@@ -6,7 +6,7 @@ import FormFooter from "../components/form/FormFooter";
 const SignupPage = () => {
   return (
     <div className="flex mb-20">
-      <div className="w-full max-w-xs m-auto bg-indigo-100 rounded p-5">
+      <div className="w-full max-w-sm m-auto bg-indigo-100 rounded p-5">
         <FormHeader text="Signup Here." />
         <form>
           <TextInput
@@ -48,10 +48,8 @@ const SignupPage = () => {
           </div>
         </form>
         <FormFooter
-          leftLink="#"
-          leftText="Forgot Password?"
-          rightLink="/signup"
-          rightText="Create Account"
+          rightLink="/login"
+          rightText="Login Your Account"
         />
       </div>
     </div>
