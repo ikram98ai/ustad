@@ -1,7 +1,6 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import NavBar from "./NavBar";
 import NavBtm from "./NavBtm";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -18,9 +17,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" data-theme="winter">
-      <body className={inter.className}>
-        <NavBar />
-        <main className=" text-slate-900">{children}</main>
+      <body className={inter.className + "  p-4 text-gray-950"}>
+        <main>{children}</main>
         <NavBtm />
       </body>
     </html>

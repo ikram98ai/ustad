@@ -1,9 +1,9 @@
-import React from 'react'
+import LoginPage from "../login/page";
 
 const ProfilePage = () => {
-  return (
-    <div>Profile Page</div>
-  )
-}
+  const user = "ikram";
 
-export default ProfilePage
+  return user ? <LoginPage /> : <div>Profile Page</div>;
+};
+
+export default ProfilePage;
