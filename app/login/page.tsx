@@ -1,40 +1,50 @@
-import React from "react";
+"use client";
 import FormHeader from "../components/form/FormHeader";
-import TextInput from "../components/form/TextInput";
 import FormFooter from "../components/form/FormFooter";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import styles from "../styleObj";
 
 const LoginPage = () => {
-  return (
-    <div className="flex h-screen">
-      <div className="w-full max-w-xs m-auto bg-indigo-100 rounded p-5">
-        <FormHeader text="Login Here." />
-        <form>
-          <TextInput
-            labelText="Username"
-            inputType="text"
-            inputName="username"
-          />
-          <TextInput
-            labelText="Password"
-            inputType="password"
-            inputName="password"
-          />
+  const formInit = {
+    email: "",
+    password: "",
+  };
 
-          <div>
-            <input
-              className="w-full bg-indigo-700 hover:bg-green-600 text-white font-bold py-2 px-4 mb-6 rounded"
-              type="submit"
+  return (
+    <Formik
+      initialValues={formInit}
+      onSubmit={(values) => {
+        alert(JSON.stringify(values, null, 2));
+      }}
+    >
+      <Form>
+        <div className="flex h-screen">
+          <div className="w-full max-w-xs m-auto bg-indigo-100 rounded p-5">
+            <FormHeader text="Login Here." />
+            <Field
+              className={styles.textInput}
+              name="email"
+              type="email"
+              placeholder="Email..."
+            />
+            <ErrorMessage name="email"/>
+            <Field
+              className={styles.textInput}
+              name="password"
+              type="password"
+              placeholder="Password..."
+            />
+            <input className={styles.submitBtn} type="submit" />
+            <FormFooter
+              leftLink="#"
+              leftText="Forgot Password?"
+              rightLink="/signup"
+              rightText="Create Account"
             />
           </div>
-        </form>
-        <FormFooter
-          leftLink="#"
-          leftText="Forgot Password?"
-          rightLink="/signup"
-          rightText="Create Account"
-        />
-      </div>
-    </div>
+        </div>
+      </Form>
+    </Formik>
   );
 };
 
