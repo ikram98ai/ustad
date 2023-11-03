@@ -6,8 +6,67 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider     = "postgresql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
 }
 
+// model Profession {
+//   id Int @id @default(autoincrement())
+//   title String @db.VarChar(255)
+// }
 
+model Gig {
+  id                 Int        @id @default(autoincrement())
+  title              String     @db.VarChar(255)
+  description        String     @db.Text
+  rate               Float     
+  availability_range Float     
+  available          Boolean    @default(true)
+  created_at         DateTime   @default(now())
+  job_type           JobType    @default(FIX)
+  profession         Profession
+}
+
+enum Profession {
+  ELECTRICIAN
+  PLUMBER
+  MECHANIC
+  TUTOR
+  BARBER
+  LABOUR
+}
+
+enum JobType {
+  FIX
+  HOURLY
+  DAILY
+  MONTHLY
+}
+
+// model Location {
+//   id Int @id @default(autoincrement())
+//   x Decimal @default(0.0)
+//   y Decimal @default(0.0)
+// }
+
+// model Order {
+//   id Int @id @default(autoincrement())
+//   startedAt DateTime    @default(now())
+//   endAt     DateTime
+//   rate      Decimal
+//   job_type  JobType     @default(FIX)
+//   status    OrderStatus @default(PENDING)
+// }
+
+// enum OrderStatus {
+//   PENDING //ONLY 3 AT A TIME
+//   IN_PROGRESS
+//   COMPLETE
+// }
+
+// model Review {
+//   id Int @id @default(autoincrement())
+//   rating Int
+//   review String @db.Text
+// }
