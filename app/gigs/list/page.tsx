@@ -1,41 +1,43 @@
 import Pagination from "@/app/components/Pagination";
 import prisma from "@/prisma/client";
-import {AvailabilityStatus as Status } from "@prisma/client";
 import GigActions from "./GigActions";
-import GigTable, { gigQuery, columnNames } from "./GigTable";
+import GigCardList from "./GigCardList";
 import { Flex } from "@radix-ui/themes";
 import { Metadata } from "next";
+import { Gig, Profession } from "@prisma/client";
+
+export interface gigQuery {
+  profession: Profession;
+  orderBy: keyof Gig;
+  page: string;
+}
 
 interface Props {
   searchParams: gigQuery;
 }
 
-const gigsPage = async ({ searchParams }: Props) => {
-  const statuses = Object.values(Status);
-  const status = statuses.includes(searchParams.status)
-    ? searchParams.status
+const Home = async ({ searchParams }: Props) => {
+  const professions = Object.values(Profession);
+  const profession = professions.includes(searchParams.profession)
+    ? searchParams.profession
     : undefined;
-  const where = { status };
-
-  const orderBy = columnNames.includes(searchParams.orderBy)
-    ? { [searchParams.orderBy]: "asc" }
-    : undefined;
+  const where = { is_active: true, profession };
 
   const page = parseInt(searchParams.page) || 1;
-  const pageSize = 10;
+  const pageSize = 40;
 
   const gigs = await prisma.gig.findMany({
-    orderBy,
+    where,
     skip: (page - 1) * pageSize,
     take: pageSize,
   });
 
-  const gigCount = await prisma.gig.count();
+  const gigCount = await prisma.gig.count({ where });
 
   return (
     <Flex direction="column" gap="3">
       <GigActions />
-      <GigTable searchParams={searchParams} gigs={gigs} />
+      <GigCardList gigs={gigs} />
       <Pagination pageSize={pageSize} currentPage={page} itemCount={gigCount} />
     </Flex>
   );
@@ -48,4 +50,4 @@ export const metadata: Metadata = {
   description: "View all project gigs",
 };
 
-export default gigsPage;
+export default Home;

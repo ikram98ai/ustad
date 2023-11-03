@@ -60,6 +60,7 @@ const GigForm = ({ gig }: { gig?: Gig }) => {
         <ErrorMessage>{errors.title?.message}</ErrorMessage>
         <TextField.Root>
           <TextField.Input
+            type="number"
             defaultValue={gig?.rate}
             placeholder="Rate"
             {...register("rate")}
@@ -68,6 +69,7 @@ const GigForm = ({ gig }: { gig?: Gig }) => {
         <ErrorMessage>{errors.rate?.message}</ErrorMessage>
         <TextField.Root>
           <TextField.Input
+            type="number"
             defaultValue={gig?.range}
             placeholder="Range"
             {...register("range")}

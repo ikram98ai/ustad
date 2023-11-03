@@ -1,27 +1,22 @@
 "use client";
 
-import {  AvailabilityStatus } from "@prisma/client";
+import { Profession } from "@prisma/client";
 import { Select } from "@radix-ui/themes";
 import { useRouter, useSearchParams } from "next/navigation";
 import React from "react";
 
-const statuses: { label: string; value?: AvailabilityStatus }[] = [
-  { label: "All" },
-  { label: "Online", value: "ONLINE" },
-  { label: "Ofline", value: "OFLINE" },
-  { label: "On wrok", value: "ONWORK" },
-];
+const professions: string[] = ["ALL PROFESSIONS", ...Object.values(Profession)];
 
-const GigStatusFilter = () => {
+const GigProfessionFilter = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   return (
     <Select.Root
-      defaultValue={searchParams.get("status") || ""}
-      onValueChange={(status) => {
+      defaultValue={searchParams.get("profession") || "ALL PROFESSIONS"}
+      onValueChange={(profession) => {
         const params = new URLSearchParams();
-        if (status) params.append("status", status);
+        if (profession) params.append("profession", profession);
         if (searchParams.get("orderBy"))
           params.append("orderBy", searchParams.get("orderBy")!);
 
@@ -29,11 +24,11 @@ const GigStatusFilter = () => {
         router.push("/gigs/list" + query);
       }}
     >
-      <Select.Trigger placeholder="Filter by status..." />
+      <Select.Trigger placeholder="Filter by profession..." />
       <Select.Content>
-        {statuses.map((status) => (
-          <Select.Item key={status.value} value={status.value || ""}>
-            {status.label}
+        {professions.map((profession) => (
+          <Select.Item key={profession} value={profession || ""}>
+            {profession}
           </Select.Item>
         ))}
       </Select.Content>
@@ -41,4 +36,4 @@ const GigStatusFilter = () => {
   );
 };
 
-export default GigStatusFilter;
+export default GigProfessionFilter;

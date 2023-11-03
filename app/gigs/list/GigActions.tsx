@@ -1,12 +1,12 @@
 import { Button, Flex } from "@radix-ui/themes";
 import Link from "next/link";
 import React from "react";
-import GigStatusFilter from "./GigStatusFilter";
+import GigProfessionFilter from "./GigStatusFilter";
 
 const GigActions = () => {
   return (
     <Flex justify="between">
-      <GigStatusFilter />
+      <GigProfessionFilter />
       <Button>
         <Link href="/gigs/new">New gig</Link>
       </Button>

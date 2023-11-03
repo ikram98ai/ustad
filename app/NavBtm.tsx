@@ -3,28 +3,27 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const NavBtm = () => {
-  const pathname = usePathname();
-  console.log(pathname)
+  const currentPath = usePathname();
   return (
-    <nav className="btm-nav">
-      <Link href="/" className={"" +( (pathname === "/" || pathname.startsWith('/gigs')) && "active")}>
+    <nav className="btm-nav border-t">
+      <Link href="/" className={"" +( (currentPath === "/" || currentPath.startsWith('/gigs')) && "active")}>
         Gigs
       </Link>
       <Link
         href="/orders"
-        className={"" + (pathname.startsWith("/orders") && "active")}
+        className={"" + (currentPath.startsWith("/orders") && "active")}
       >
         Orders
       </Link>
       <Link
         href="/chats"
-        className={"" + (pathname.startsWith("/chats") && "active")}
+        className={"" + (currentPath.startsWith("/chats") && "active")}
       >
         Chats
       </Link>
       <Link
         href="/profile"
-        className={"" + (pathname.startsWith("/profile") && "active")}
+        className={"" + (currentPath.startsWith("/profile") && "active")}
       >
         Profile
       </Link>

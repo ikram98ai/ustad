@@ -22,17 +22,12 @@ model Gig {
   description        String             @db.Text
   rate               Float
   range              Float 
-  availability_staus AvailabilityStatus @default(ONLINE)
   created_at         DateTime           @default(now())
+  is_active          Boolean            @default(true)
   job_type           JobType            @default(FIX)
   profession         Profession
 }
 
-enum AvailabilityStatus {
-  ONWORK
-  OFLINE
-  ONLINE
-}
 
 enum Profession {
   ELECTRICIAN
