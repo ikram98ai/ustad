@@ -17,15 +17,21 @@ datasource db {
 // }
 
 model Gig {
-  id                 Int        @id @default(autoincrement())
-  title              String     @db.VarChar(255)
-  description        String     @db.Text
-  rate               Float     
-  availability_range Float     
-  available          Boolean    @default(true)
-  created_at         DateTime   @default(now())
-  job_type           JobType    @default(FIX)
+  id                 Int                @id @default(autoincrement())
+  title              String             @db.VarChar(255)
+  description        String             @db.Text
+  rate               Float
+  availability_range Float
+  availability_staus AvailabilityStatus @default(ONLINE)
+  created_at         DateTime           @default(now())
+  job_type           JobType            @default(FIX)
   profession         Profession
+}
+
+enum AvailabilityStatus {
+  ONWORK
+  OFLINE
+  ONLINE
 }
 
 enum Profession {
