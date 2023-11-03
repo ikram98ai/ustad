@@ -1,36 +1,26 @@
 "use client";
 import Link from "next/link";
-import React, { useState } from "react";
+import { usePathname } from "next/navigation";
 
 const NavBtm = () => {
-  const [active, setActive] = useState("");
+  const pathname = usePathname();
   return (
     <nav className="btm-nav">
-      <Link
-        onClick={() => setActive("")}
-        href="/"
-        className={"" + (active === "" && "active")}
-      >
-        Explore
+      <Link href="/" className={"" + (pathname === "/" && "active")}>
+        Gigs
       </Link>
       <Link
-        onClick={() => setActive("orders")}
         href="/orders"
-        className={"" + (active === "orders" && "active")}
+        className={"" + (pathname === "/orders" && "active")}
       >
         Orders
       </Link>
-      <Link
-        onClick={() => setActive("chats")}
-        href="/chats"
-        className={"" + (active === "chats" && "active")}
-      >
+      <Link href="/chats" className={"" + (pathname === "/chats" && "active")}>
         Chats
       </Link>
       <Link
-        onClick={() => setActive("profile")}
         href="/profile"
-        className={"" + (active === "profile" && "active")}
+        className={"" + (pathname === "/profile" && "active")}
       >
         Profile
       </Link>

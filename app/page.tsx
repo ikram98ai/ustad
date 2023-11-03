@@ -1,9 +1,9 @@
-import ExplorePage from "./explore/page";
+import GigsPage from "./gigs/page";
 
 export default function Home() {
   return (
     <>
-      <ExplorePage />
+      <GigsPage />
     </>
   );
 }
