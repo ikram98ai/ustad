@@ -21,7 +21,7 @@ model Gig {
   title              String             @db.VarChar(255)
   description        String             @db.Text
   rate               Float
-  availability_range Float
+  range              Float 
   availability_staus AvailabilityStatus @default(ONLINE)
   created_at         DateTime           @default(now())
   job_type           JobType            @default(FIX)

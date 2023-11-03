@@ -3,12 +3,13 @@
 @tailwind utilities;
 
 :root {
+  /* this is 255 is temp beacaue of not showing text in dev */
   --foreground-rgb: 0, 0, 0;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --foreground-rgb: 255, 255, 255;
+    --foreground-rgb: 0, 0, 0;
   }
 }
 

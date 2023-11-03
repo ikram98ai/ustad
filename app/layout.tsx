@@ -1,7 +1,10 @@
+import "@radix-ui/themes/styles.css";
+import "./theme-config.css";
 import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import NavBtm from "./NavBtm";
+import { Container, Theme } from "@radix-ui/themes";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,8 +21,12 @@ export default function RootLayout({
   return (
     <html lang="en" data-theme="winter">
       <body className={inter.className + "  p-4 text-gray-950"}>
-        <main>{children}</main>
-        <NavBtm />
+        <Theme accentColor="violet">
+          <main className="mb-12">
+            <Container>{children}</Container>
+          </main>
+          <NavBtm />
+        </Theme>
       </body>
     </html>
   );

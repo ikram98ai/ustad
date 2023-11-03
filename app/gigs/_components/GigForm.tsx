@@ -58,6 +58,30 @@ const GigForm = ({ gig }: { gig?: Gig }) => {
           />
         </TextField.Root>
         <ErrorMessage>{errors.title?.message}</ErrorMessage>
+        <TextField.Root>
+          <TextField.Input
+            defaultValue={gig?.rate}
+            placeholder="Rate"
+            {...register("rate")}
+          />
+        </TextField.Root>
+        <ErrorMessage>{errors.rate?.message}</ErrorMessage>
+        <TextField.Root>
+          <TextField.Input
+            defaultValue={gig?.range}
+            placeholder="Range"
+            {...register("range")}
+          />
+        </TextField.Root>
+        <ErrorMessage>{errors.range?.message}</ErrorMessage>
+        <TextField.Root>
+          <TextField.Input
+            defaultValue={gig?.profession}
+            placeholder="Profession"
+            {...register("profession")}
+          />
+        </TextField.Root>
+        <ErrorMessage>{errors.profession?.message}</ErrorMessage>
         <Controller
           name="description"
           control={control}

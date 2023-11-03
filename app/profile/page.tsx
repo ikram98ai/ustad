@@ -1,12 +1,17 @@
-import LoginPage from "../login/page";
+import { Button } from "@radix-ui/themes";
+import Link from "next/link";
 
 const ProfilePage = () => {
   // const user = "ikram";
 
   // return user ? <LoginPage /> : <div>Profile Page</div>;
   return (
-    <div>Profile Page</div>
-  )
+    <>
+      <Button>
+        <Link href="/gigs/new">Create Gig</Link>
+      </Button>
+    </>
+  );
 };
 
 export default ProfilePage;
