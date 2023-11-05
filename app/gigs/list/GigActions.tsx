@@ -7,9 +7,9 @@ const GigActions = () => {
   return (
     <Flex justify="between">
       <GigProfessionFilter />
-      <Button>
+      {/* <Button>
         <Link href="/gigs/new">New gig</Link>
-      </Button>
+      </Button> */}
     </Flex>
   );
 };

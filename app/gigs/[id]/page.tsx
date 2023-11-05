@@ -6,6 +6,7 @@ import GigDetails from "./GigDetails";
 import DeleteGigButton from "./DeleteGigButton";
 import { getServerSession } from "next-auth";
 import { cache } from "react";
+import authOptions from "@/app/auth/authOptions";
 
 interface Props {
   params: { id: string };
@@ -16,7 +17,7 @@ const fetchUser = cache((gigId: number) =>
 );
 
 const GigDetailPage = async ({ params }: Props) => {
-  const session = "await getServerSession(authOptions);";
+  const session = await getServerSession(authOptions);
 
   const gig = await fetchUser(parseInt(params.id));
 
