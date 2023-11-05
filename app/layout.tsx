@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import NavBtm from "./NavBtm";
 import { Container, Theme } from "@radix-ui/themes";
+import AuthProvider from "./auth/Provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,12 +22,14 @@ export default function RootLayout({
   return (
     <html lang="en" data-theme="winter">
       <body className={inter.className + "  p-4 text-gray-950"}>
-        <Theme accentColor="violet">
-          <main className="mb-12">
-            <Container>{children}</Container>
-          </main>
-          <NavBtm />
-        </Theme>
+        <AuthProvider>
+          <Theme accentColor="violet">
+            <main className="mb-12">
+              <Container>{children}</Container>
+            </main>
+            <NavBtm />
+          </Theme>
+        </AuthProvider>
       </body>
     </html>
   );
