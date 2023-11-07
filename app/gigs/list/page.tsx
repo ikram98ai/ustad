@@ -17,7 +17,7 @@ interface Props {
 }
 
 const Home = async ({ searchParams }: Props) => {
-  const professions = Object.values(Profession);
+  const professions = await prisma.profession.findMany()
   const profession = professions.includes(searchParams.profession)
     ? searchParams.profession
     : undefined;

@@ -5,9 +5,11 @@ import { Select } from "@radix-ui/themes";
 import { useRouter, useSearchParams } from "next/navigation";
 import React from "react";
 
-const professions: string[] = ["ALL PROFESSIONS", ...Object.values(Profession)];
-
-const GigProfessionFilter = () => {
+const GigProfessionFilter = ({
+  professions,
+}: {
+  professions: Profession[];
+}) => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -26,9 +28,9 @@ const GigProfessionFilter = () => {
     >
       <Select.Trigger placeholder="Filter by profession..." />
       <Select.Content>
-        {professions.map((profession) => (
-          <Select.Item key={profession} value={profession || ""}>
-            {profession}
+        {professions?.map((profession) => (
+          <Select.Item key={profession.id} value={profession.title || ""}>
+            {profession.title}
           </Select.Item>
         ))}
       </Select.Content>

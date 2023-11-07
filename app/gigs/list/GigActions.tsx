@@ -1,15 +1,13 @@
-import { Button, Flex } from "@radix-ui/themes";
-import Link from "next/link";
+import { Flex } from "@radix-ui/themes";
 import React from "react";
-import GigProfessionFilter from "./GigStatusFilter";
+import GigProfessionFilter from "./GigProfessionFilter";
+import prisma from "@/prisma/client";
 
-const GigActions = () => {
+const GigActions = async () => {
+  const professions = await prisma.profession.findMany();
   return (
     <Flex justify="between">
-      <GigProfessionFilter />
-      {/* <Button>
-        <Link href="/gigs/new">New gig</Link>
-      </Button> */}
+      <GigProfessionFilter professions={professions} />
     </Flex>
   );
 };

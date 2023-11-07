@@ -4,8 +4,8 @@ import ErrorMessage from "@/app/components/ErrorMessage";
 import Spinner from "@/app/components/Spinner";
 import { gigSchema } from "@/app/validationSchemas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Gig } from "@prisma/client";
-import { Button, Callout, TextField } from "@radix-ui/themes";
+import { Gig, Profession } from "@prisma/client";
+import { Button, Callout, Select, TextField } from "@radix-ui/themes";
 import axios from "axios";
 import "easymde/dist/easymde.min.css";
 import { useRouter } from "next/navigation";
@@ -16,7 +16,7 @@ import { z } from "zod";
 
 type GigFormData = z.infer<typeof gigSchema>;
 
-const GigForm = ({ gig }: { gig?: Gig }) => {
+const GigForm = ({ gig,professions }: { gig?: Gig ,professions:Profession[]}) => {
   const router = useRouter();
   const {
     register,
@@ -28,7 +28,6 @@ const GigForm = ({ gig }: { gig?: Gig }) => {
   });
   const [error, setError] = useState("");
   const [isSubmitting, setSubmitting] = useState(false);
-
   const onSubmit = handleSubmit(async (data) => {
     try {
       setSubmitting(true);
@@ -76,13 +75,19 @@ const GigForm = ({ gig }: { gig?: Gig }) => {
           />
         </TextField.Root>
         <ErrorMessage>{errors.range?.message}</ErrorMessage>
-        <TextField.Root>
-          <TextField.Input
-            defaultValue={gig?.profession}
-            placeholder="Profession"
-            {...register("profession")}
-          />
-        </TextField.Root>
+        <Select.Root defaultValue={gig?.title}>
+          <Select.Trigger placeholder="Profession..." />
+          <Select.Content>
+            <Select.Group>
+              <Select.Label>Profession</Select.Label>
+              {professions?.map((profession) => (
+                <Select.Item key={profession.id} value={profession.title}>
+                  {profession.title}
+                </Select.Item>
+              ))}
+            </Select.Group>
+          </Select.Content>
+        </Select.Root>
         <ErrorMessage>{errors.profession?.message}</ErrorMessage>
         <Controller
           name="description"
@@ -102,3 +107,4 @@ const GigForm = ({ gig }: { gig?: Gig }) => {
 };
 
 export default GigForm;
+

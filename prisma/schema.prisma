@@ -6,35 +6,30 @@ generator client {
 }
 
 datasource db {
-  provider     = "postgresql"
-  url          = env("DATABASE_URL")
-  relationMode = "prisma"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
-// model Profession {
-//   id Int @id @default(autoincrement())
-//   title String @db.VarChar(255)
-// }
+model Profession {
+  id    Int    @id @default(autoincrement())
+  title String @db.VarChar(255) @unique
+  gigs  Gig[]
+}
 
 model Gig {
-  id          Int        @id @default(autoincrement())
-  title       String     @db.VarChar(255)
-  description String     @db.Text
-  rate        Float
-  range       Float
-  created_at  DateTime   @default(now())
-  is_active   Boolean    @default(true)
-  job_type    JobType    @default(FIX)
-  profession  Profession
-}
-
-enum Profession {
-  ELECTRICIAN
-  PLUMBER
-  MECHANIC
-  TUTOR
-  BARBER
-  LABOUR
+  id           String     @id @default(cuid())
+  title        String     @db.VarChar(255)
+  description  String     @db.Text
+  rate         Float
+  range        Float
+  created_at   DateTime   @default(now())
+  is_active    Boolean    @default(true)
+  job_type     JobType    @default(FIX)
+  professionId Int
+  profession   Profession @relation(fields: [professionId], references: [id])
+  userId       String     @db.VarChar(255)
+  user         User       @relation(fields: [userId], references: [id])
+  orders       Order[]
 }
 
 enum JobType {
@@ -50,26 +45,42 @@ enum JobType {
 //   y Decimal @default(0.0)
 // }
 
-// model Order {
-//   id Int @id @default(autoincrement())
-//   startedAt DateTime    @default(now())
-//   endAt     DateTime
-//   rate      Decimal
-//   job_type  JobType     @default(FIX)
-//   status    OrderStatus @default(PENDING)
-// }
+model Order {
+  id        Int         @id @default(autoincrement())
+  startedAt DateTime    @default(now())
+  endAt     DateTime
+  rate      Decimal
+  job_type  JobType     @default(HOURLY)
+  status    OrderStatus @default(PENDING)
+  userId    String
+  user      User        @relation(fields: [userId], references: [id])
+  gigId     String
+  gigUser   Gig         @relation(fields: [gigId], references: [id])
+}
 
-// enum OrderStatus {
-//   PENDING //ONLY 3 AT A TIME
-//   IN_PROGRESS
-//   COMPLETE
-// }
+enum OrderStatus {
+  PENDING //ONLY 3 AT A TIME
+  IN_PROGRESS
+  COMPLETE
+}
 
 // model Review {
 //   id Int @id @default(autoincrement())
 //   rating Int
 //   review String @db.Text
 // }
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  gigs          Gig[]
+  orders        Order[]
+  accounts      Account[]
+  sessions      Session[]
+}
 
 model Account {
   id                String  @id @default(cuid())
@@ -95,16 +106,6 @@ model Session {
   userId       String
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  accounts      Account[]
-  sessions      Session[]
 }
 
 model VerificationToken {
