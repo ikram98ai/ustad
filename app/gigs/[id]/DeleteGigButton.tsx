@@ -6,7 +6,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-const DeleteGigButton = ({ gigId }: { gigId: number }) => {
+const DeleteGigButton = ({ gigId }: { gigId: string }) => {
   const router = useRouter();
   const [error, setError] = useState(false);
   const [isDeleting, setDeleting] = useState(false);

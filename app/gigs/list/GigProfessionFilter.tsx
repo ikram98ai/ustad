@@ -15,7 +15,7 @@ const GigProfessionFilter = ({
 
   return (
     <Select.Root
-      defaultValue={searchParams.get("profession") || "ALL PROFESSIONS"}
+      defaultValue={searchParams.get("profession") || undefined}
       onValueChange={(profession) => {
         const params = new URLSearchParams();
         if (profession) params.append("profession", profession);
@@ -26,13 +26,16 @@ const GigProfessionFilter = ({
         router.push("/gigs/list" + query);
       }}
     >
-      <Select.Trigger placeholder="Filter by profession..." />
+      <Select.Trigger placeholder="Profession..." />
       <Select.Content>
-        {professions?.map((profession) => (
-          <Select.Item key={profession.id} value={profession.title || ""}>
-            {profession.title}
-          </Select.Item>
-        ))}
+        <Select.Group>
+          <Select.Label>Profession</Select.Label>
+          {professions?.map((profession) => (
+            <Select.Item key={profession.id} value={profession.title}>
+              {profession.title}
+            </Select.Item>
+          ))}
+        </Select.Group>
       </Select.Content>
     </Select.Root>
   );

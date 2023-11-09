@@ -2,7 +2,7 @@ import { Pencil2Icon } from "@radix-ui/react-icons";
 import { Button } from "@radix-ui/themes";
 import Link from "next/link";
 
-const EditGigButton = ({ gigId }: { gigId: number }) => {
+const EditGigButton = ({ gigId }: { gigId: string }) => {
   return (
     <Button>
       <Pencil2Icon />

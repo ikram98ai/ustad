@@ -12,14 +12,14 @@ interface Props {
   params: { id: string };
 }
 
-const fetchUser = cache((gigId: number) =>
+const fetchUser = cache((gigId: string) =>
   prisma.gig.findUnique({ where: { id: gigId } })
 );
 
 const GigDetailPage = async ({ params }: Props) => {
   const session = await getServerSession(authOptions);
 
-  const gig = await fetchUser(parseInt(params.id));
+  const gig = await fetchUser(params.id);
 
   if (!gig) notFound();
 
@@ -41,7 +41,7 @@ const GigDetailPage = async ({ params }: Props) => {
 };
 
 export async function generateMetadata({ params }: Props) {
-  const gig = await fetchUser(parseInt(params.id));
+  const gig = await fetchUser(params.id);
 
   return {
     title: gig?.title,

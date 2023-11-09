@@ -4,10 +4,10 @@ import GigActions from "./GigActions";
 import GigCardList from "./GigCardList";
 import { Flex } from "@radix-ui/themes";
 import { Metadata } from "next";
-import { Gig, Profession } from "@prisma/client";
+import { Gig } from "@prisma/client";
 
 export interface gigQuery {
-  profession: Profession;
+  profession: string | undefined;
   orderBy: keyof Gig;
   page: string;
 }
@@ -17,11 +17,14 @@ interface Props {
 }
 
 const Home = async ({ searchParams }: Props) => {
-  const professions = await prisma.profession.findMany()
-  const profession = professions.includes(searchParams.profession)
-    ? searchParams.profession
+  const profession = searchParams.profession
+    ? await prisma.profession.findUnique({
+        where: { title: searchParams.profession },
+        select: { id: true },
+      })
     : undefined;
-  const where = { is_active: true, profession };
+
+  const where = { is_active: true, professionId: profession?.id };
 
   const page = parseInt(searchParams.page) || 1;
   const pageSize = 40;

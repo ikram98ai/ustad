@@ -1,3 +1,4 @@
+import authOptions from "@/app/auth/authOptions";
 import { gigSchema } from "@/app/validationSchemas";
 import prisma from "@/prisma/client";
 import { getServerSession } from "next-auth";
@@ -7,7 +8,7 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const session = "await getServerSession(authOptions);";
+  const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({}, { status: 401 });
 
   const body = await request.json();
@@ -20,7 +21,7 @@ export async function PATCH(
   const { title, rate, range, profession, description } = body;
 
   const gig = await prisma.gig.findUnique({
-    where: { id: parseInt(params.id) },
+    where: { id: params.id },
   });
   if (!gig) return NextResponse.json({ error: "Invalid gig" }, { status: 404 });
 
@@ -42,11 +43,11 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const session = "await getServerSession(authOptions);";
+  const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({}, { status: 401 });
 
   const gig = await prisma.gig.findUnique({
-    where: { id: parseInt(params.id) },
+    where: { id: params.id },
   });
 
   if (!gig) return NextResponse.json({ error: "Invalid gig" }, { status: 404 });

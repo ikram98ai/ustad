@@ -16,8 +16,15 @@ import { z } from "zod";
 
 type GigFormData = z.infer<typeof gigSchema>;
 
-const GigForm = ({ gig,professions }: { gig?: Gig ,professions:Profession[]}) => {
+const GigForm = ({
+  gig,
+  professions,
+}: {
+  gig?: Gig;
+  professions: Profession[];
+}) => {
   const router = useRouter();
+
   const {
     register,
     control,
@@ -26,8 +33,10 @@ const GigForm = ({ gig,professions }: { gig?: Gig ,professions:Profession[]}) =>
   } = useForm<GigFormData>({
     resolver: zodResolver(gigSchema),
   });
+
   const [error, setError] = useState("");
   const [isSubmitting, setSubmitting] = useState(false);
+
   const onSubmit = handleSubmit(async (data) => {
     try {
       setSubmitting(true);
@@ -75,19 +84,35 @@ const GigForm = ({ gig,professions }: { gig?: Gig ,professions:Profession[]}) =>
           />
         </TextField.Root>
         <ErrorMessage>{errors.range?.message}</ErrorMessage>
-        <Select.Root defaultValue={gig?.title}>
-          <Select.Trigger placeholder="Profession..." />
-          <Select.Content>
-            <Select.Group>
-              <Select.Label>Profession</Select.Label>
-              {professions?.map((profession) => (
-                <Select.Item key={profession.id} value={profession.title}>
-                  {profession.title}
-                </Select.Item>
-              ))}
-            </Select.Group>
-          </Select.Content>
-        </Select.Root>
+        <Controller
+          name="profession"
+          control={control}
+          defaultValue={gig ? professions[gig.professionId!].title : undefined}
+          render={({ field }) => (
+            <Select.Root
+              {...field}
+              defaultValue={
+                gig ? professions[gig.professionId].title : undefined
+              }
+              onValueChange={field.onChange}
+            >
+              <Select.Trigger placeholder="Profession..." />
+              <Select.Content>
+                <Select.Group>
+                  <Select.Label>Profession</Select.Label>
+                  {professions?.map((profession) => (
+                    <Select.Item
+                      key={profession.id}
+                      value={profession.id.toString()}
+                    >
+                      {profession.title}
+                    </Select.Item>
+                  ))}
+                </Select.Group>
+              </Select.Content>
+            </Select.Root>
+          )}
+        />
         <ErrorMessage>{errors.profession?.message}</ErrorMessage>
         <Controller
           name="description"
@@ -107,4 +132,3 @@ const GigForm = ({ gig,professions }: { gig?: Gig ,professions:Profession[]}) =>
 };
 
 export default GigForm;
-
