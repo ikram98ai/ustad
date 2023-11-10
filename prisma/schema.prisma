@@ -49,7 +49,7 @@ model Order {
   id        String      @id @default(cuid())
   startedAt DateTime    @default(now())
   endAt     DateTime
-  rate      Decimal
+  rate      Float
   job_type  JobType     @default(HOURLY)
   status    OrderStatus @default(PENDING)
   userId    String
