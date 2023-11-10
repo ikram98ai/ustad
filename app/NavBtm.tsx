@@ -9,9 +9,10 @@ const NavBtm = () => {
   const { status, data: session } = useSession();
   const links = [
     { label: "Home", href: "/" },
+    { label: "Gigs", href: "/gigs/list" },
     { label: "Orders", href: "/orders" },
     { label: "Chats", href: "/chats" },
-    { label: "", href: "/profile" },
+    { label: "Profile", href: "/profile" },
   ];
   return (
     <nav className="btm-nav border-t">

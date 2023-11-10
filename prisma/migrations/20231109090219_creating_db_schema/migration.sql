@@ -6,7 +6,7 @@ CREATE TYPE "OrderStatus" AS ENUM ('PENDING', 'IN_PROGRESS', 'COMPLETE');
 
 -- CreateTable
 CREATE TABLE "Profession" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "title" VARCHAR(255) NOT NULL,
 
     CONSTRAINT "Profession_pkey" PRIMARY KEY ("id")
@@ -22,7 +22,7 @@ CREATE TABLE "Gig" (
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "is_active" BOOLEAN NOT NULL DEFAULT true,
     "job_type" "JobType" NOT NULL DEFAULT 'FIX',
-    "professionId" INTEGER NOT NULL,
+    "professionId" TEXT NOT NULL,
     "userId" VARCHAR(255) NOT NULL,
 
     CONSTRAINT "Gig_pkey" PRIMARY KEY ("id")
@@ -30,7 +30,7 @@ CREATE TABLE "Gig" (
 
 -- CreateTable
 CREATE TABLE "Order" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "startedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "endAt" TIMESTAMP(3) NOT NULL,
     "rate" DECIMAL(65,30) NOT NULL,
@@ -87,6 +87,9 @@ CREATE TABLE "VerificationToken" (
     "token" TEXT NOT NULL,
     "expires" TIMESTAMP(3) NOT NULL
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Profession_title_key" ON "Profession"("title");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");

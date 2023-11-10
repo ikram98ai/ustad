@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
       title: body.title,
       rate: parseFloat(body.rate),
       range: parseFloat(body.range),
-      professionId: parseInt(body.profession),
+      professionId: body.professionId,
       description: body.description,
       userId: user!.id,
     },

@@ -1,11 +1,7 @@
-import GigsPage, { gigQuery } from "./gigs/list/page";
-interface Props {
-  searchParams: gigQuery;
-}
-export default function Home({ searchParams }: Props) {
+export default function Home() {
   return (
     <>
-      <GigsPage searchParams={searchParams} />
+      <h1>Wellcome to home paeg</h1>
     </>
   );
 }

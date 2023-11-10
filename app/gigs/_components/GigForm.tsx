@@ -4,8 +4,15 @@ import ErrorMessage from "@/app/components/ErrorMessage";
 import Spinner from "@/app/components/Spinner";
 import { gigSchema } from "@/app/validationSchemas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Gig, Profession } from "@prisma/client";
-import { Button, Callout, Select, TextField } from "@radix-ui/themes";
+import { Gig, JobType, Profession } from "@prisma/client";
+import {
+  Box,
+  Button,
+  Callout,
+  Flex,
+  Select,
+  TextField,
+} from "@radix-ui/themes";
 import axios from "axios";
 import "easymde/dist/easymde.min.css";
 import { useRouter } from "next/navigation";
@@ -24,6 +31,10 @@ const GigForm = ({
   professions: Profession[];
 }) => {
   const router = useRouter();
+  const [error, setError] = useState("");
+  const [isSubmitting, setSubmitting] = useState(false);
+
+  const job_types = Object.values(JobType);
 
   const {
     register,
@@ -33,9 +44,6 @@ const GigForm = ({
   } = useForm<GigFormData>({
     resolver: zodResolver(gigSchema),
   });
-
-  const [error, setError] = useState("");
-  const [isSubmitting, setSubmitting] = useState(false);
 
   const onSubmit = handleSubmit(async (data) => {
     try {
@@ -66,15 +74,43 @@ const GigForm = ({
           />
         </TextField.Root>
         <ErrorMessage>{errors.title?.message}</ErrorMessage>
-        <TextField.Root>
-          <TextField.Input
-            type="number"
-            defaultValue={gig?.rate}
-            placeholder="Rate"
-            {...register("rate")}
-          />
-        </TextField.Root>
-        <ErrorMessage>{errors.rate?.message}</ErrorMessage>
+        <Flex gap='3'>
+          <Box>
+            <TextField.Root>
+              <TextField.Input
+                type="number"
+                defaultValue={gig?.rate}
+                placeholder="Rate"
+                {...register("rate")}
+              />
+            </TextField.Root>
+            <ErrorMessage>{errors.rate?.message}</ErrorMessage>
+          </Box>
+          <Box>
+            <Controller
+              name="job_type"
+              control={control}
+              defaultValue={gig?.job_type}
+              render={({ field }) => (
+                <Select.Root {...field} onValueChange={field.onChange}>
+                  <Select.Trigger placeholder="Job Type..." />
+                  <Select.Content>
+                    <Select.Group>
+                      <Select.Label>Job Type</Select.Label>
+                      {job_types?.map((job_type) => (
+                        <Select.Item key={job_type} value={job_type}>
+                          {job_type}
+                        </Select.Item>
+                      ))}
+                    </Select.Group>
+                  </Select.Content>
+                </Select.Root>
+              )}
+            />
+            <ErrorMessage>{errors.job_type?.message}</ErrorMessage>
+          </Box>
+        </Flex>
+
         <TextField.Root>
           <TextField.Input
             type="number"
@@ -85,26 +121,17 @@ const GigForm = ({
         </TextField.Root>
         <ErrorMessage>{errors.range?.message}</ErrorMessage>
         <Controller
-          name="profession"
+          name="professionId"
           control={control}
-          defaultValue={gig ? professions[gig.professionId!].title : undefined}
+          defaultValue={gig?.professionId.toString()}
           render={({ field }) => (
-            <Select.Root
-              {...field}
-              defaultValue={
-                gig ? professions[gig.professionId].title : undefined
-              }
-              onValueChange={field.onChange}
-            >
+            <Select.Root {...field} onValueChange={field.onChange}>
               <Select.Trigger placeholder="Profession..." />
               <Select.Content>
                 <Select.Group>
                   <Select.Label>Profession</Select.Label>
                   {professions?.map((profession) => (
-                    <Select.Item
-                      key={profession.id}
-                      value={profession.id.toString()}
-                    >
+                    <Select.Item key={profession.id} value={profession.id}>
                       {profession.title}
                     </Select.Item>
                   ))}
@@ -113,7 +140,7 @@ const GigForm = ({
             </Select.Root>
           )}
         />
-        <ErrorMessage>{errors.profession?.message}</ErrorMessage>
+        <ErrorMessage>{errors.professionId?.message}</ErrorMessage>
         <Controller
           name="description"
           control={control}

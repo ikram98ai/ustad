@@ -4,11 +4,9 @@ import GigActions from "./GigActions";
 import GigCardList from "./GigCardList";
 import { Flex } from "@radix-ui/themes";
 import { Metadata } from "next";
-import { Gig } from "@prisma/client";
 
 export interface gigQuery {
   profession: string | undefined;
-  orderBy: keyof Gig;
   page: string;
 }
 

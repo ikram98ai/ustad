@@ -15,7 +15,7 @@ const GigProfessionFilter = ({
 
   return (
     <Select.Root
-      defaultValue={searchParams.get("profession") || undefined}
+      defaultValue={searchParams.get("profession") || ''}
       onValueChange={(profession) => {
         const params = new URLSearchParams();
         if (profession) params.append("profession", profession);
@@ -30,6 +30,7 @@ const GigProfessionFilter = ({
       <Select.Content>
         <Select.Group>
           <Select.Label>Profession</Select.Label>
+          <Select.Item value="">All Professions</Select.Item>
           {professions?.map((profession) => (
             <Select.Item key={profession.id} value={profession.title}>
               {profession.title}

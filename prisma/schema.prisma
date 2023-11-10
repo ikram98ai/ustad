@@ -11,8 +11,8 @@ datasource db {
 }
 
 model Profession {
-  id    Int    @id @default(autoincrement())
-  title String @db.VarChar(255) @unique
+  id    String @id @default(cuid())
+  title String @unique @db.VarChar(255)
   gigs  Gig[]
 }
 
@@ -25,7 +25,7 @@ model Gig {
   created_at   DateTime   @default(now())
   is_active    Boolean    @default(true)
   job_type     JobType    @default(FIX)
-  professionId Int
+  professionId String
   profession   Profession @relation(fields: [professionId], references: [id])
   userId       String     @db.VarChar(255)
   user         User       @relation(fields: [userId], references: [id])
@@ -40,13 +40,13 @@ enum JobType {
 }
 
 // model Location {
-//   id Int @id @default(autoincrement())
+//   id String @id  @default(cuid())
 //   x Decimal @default(0.0)
 //   y Decimal @default(0.0)
 // }
 
 model Order {
-  id        Int         @id @default(autoincrement())
+  id        String      @id @default(cuid())
   startedAt DateTime    @default(now())
   endAt     DateTime
   rate      Decimal
@@ -65,7 +65,7 @@ enum OrderStatus {
 }
 
 // model Review {
-//   id Int @id @default(autoincrement())
+//   id Int @id  @default(cuid())
 //   rating Int
 //   review String @db.Text
 // }

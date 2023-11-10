@@ -1,5 +1,5 @@
 import authOptions from "@/app/auth/authOptions";
-import { gigSchema } from "@/app/validationSchemas";
+import { patchGigSchema } from "@/app/validationSchemas";
 import prisma from "@/prisma/client";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
@@ -12,13 +12,12 @@ export async function PATCH(
   if (!session) return NextResponse.json({}, { status: 401 });
 
   const body = await request.json();
-  const validation = gigSchema.safeParse(body);
+
+  const validation = patchGigSchema.safeParse(body);
   if (!validation.success)
     return NextResponse.json(validation.error.format(), {
       status: 400,
     });
-
-  const { title, rate, range, profession, description } = body;
 
   const gig = await prisma.gig.findUnique({
     where: { id: params.id },
@@ -28,11 +27,11 @@ export async function PATCH(
   const updatedGig = await prisma.gig.update({
     where: { id: gig.id },
     data: {
-      title,
+      title: body.title,
       rate: parseFloat(body.rate),
       range: parseFloat(body.range),
-      profession,
-      description,
+      professionId: body.professionId,
+      description: body.description,
     },
   });
 
