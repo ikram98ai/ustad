@@ -17,7 +17,7 @@ interface Props {
   orders: Order[];
 }
 
-const IssueTable = ({ searchParams, orders }: Props) => {
+const OrderTable = ({ searchParams, orders }: Props) => {
   return (
     <Table.Root variant="surface">
       <Table.Header>
@@ -48,7 +48,7 @@ const IssueTable = ({ searchParams, orders }: Props) => {
         {orders.map((order) => (
           <Table.Row key={order.id}>
             <Table.Cell>
-              <Link href={`/issues/${order.id}`}>{order.id}</Link>
+              <Link href={`/orders/${order.id}`}>{order.id}</Link>
               <div className="block md:hidden">
                 <OrderStatusBadge status={order.status} />
               </div>
@@ -86,4 +86,4 @@ const columns: {
 
 export const columnNames = columns.map((column) => column.value);
 
-export default IssueTable;
+export default OrderTable;

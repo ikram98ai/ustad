@@ -14,7 +14,7 @@ const DeleteOrderButton = ({ orderId }: { orderId: number }) => {
   const deleteOrder = async () => {
     try {
       setDeleting(true);
-      await axios.delete("/api/gigs/${id}/orders/" + orderId);
+      await axios.delete("/api/orders/" + orderId);
       router.push("/orders/list");
       router.refresh();
     } catch (error) {

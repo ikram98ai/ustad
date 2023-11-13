@@ -46,22 +46,25 @@ enum JobType {
 // }
 
 model Order {
-  id        String      @id @default(cuid())
-  startedAt DateTime    @default(now())
-  endAt     DateTime
-  rate      Float
-  job_type  JobType     @default(HOURLY)
-  status    OrderStatus @default(PENDING)
-  userId    String
-  user      User        @relation(fields: [userId], references: [id])
-  gigId     String
-  gigUser   Gig         @relation(fields: [gigId], references: [id])
+  id           String      @id @default(cuid())
+  startedAt    DateTime    @default(now())
+  endAt        DateTime?    
+  rate         Float
+  job_type     JobType     @default(HOURLY)
+  requirements String      @db.Text
+  status       OrderStatus @default(PENDING)
+  userId       String
+  user         User        @relation(fields: [userId], references: [id])
+  gigId        String
+  gigUser      Gig         @relation(fields: [gigId], references: [id])
 }
 
 enum OrderStatus {
-  PENDING //ONLY 3 AT A TIME
-  IN_PROGRESS
-  COMPLETE
+  PENDING //Ustads can have ONLY 3 ORDERS AT A TIME
+  CANCELLED //Customer can cancel
+  REJECTED //Ustad can reject
+  ACCEPTED //Ustad can accept ONLY  ORDERS 3 AT A TIME
+  COMPLETE //Agreement of both can complete
 }
 
 // model Review {

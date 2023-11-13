@@ -8,8 +8,10 @@ import React from "react";
 const statuses: { label: string; value?: OrderStatus }[] = [
   { label: "All" },
   { label: "Pending", value: "PENDING" },
-  { label: "In Progress", value: "IN_PROGRESS" },
-  { label: "Complete", value: "COMPLETE" },
+  { label: "Working", value: "ACCEPTED" },
+  { label: "Rejected", value: "REJECTED" },
+  { label: "Cancelled", value: "CANCELLED" },
+  { label: "Completed", value: "COMPLETE" },
 ];
 
 const OrderStatusFilter = () => {
@@ -32,7 +34,7 @@ const OrderStatusFilter = () => {
       <Select.Trigger placeholder="Filter by status..." />
       <Select.Content>
         {statuses.map((status) => (
-          <Select.Item key={status.value} value={status.value || ""}>
+          <Select.Item key={status.label} value={status.value || ""}>
             {status.label}
           </Select.Item>
         ))}

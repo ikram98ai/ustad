@@ -2,6 +2,7 @@ import { Avatar, Box, Card, Flex, Grid, Text } from "@radix-ui/themes";
 import Link from "next/link";
 import React from "react";
 import { Gig } from "@prisma/client";
+import OrderGig from "../_components/OrderGig";
 
 interface Props {
   gigs: Gig[];
@@ -19,7 +20,7 @@ const GigCardList = ({ gigs }: Props) => {
               radius="full"
               fallback={gig.title[0]}
             />
-            <Box>
+            <Flex direction='column' gap='2'>
               <Link href={`/gigs/${gig.id}`}>
                 <Text as="div" size="2" weight="bold">
                   {gig.title}
@@ -28,7 +29,8 @@ const GigCardList = ({ gigs }: Props) => {
               <Text as="div" size="1" color="gray">
                 ${gig.rate} {gig.job_type}
               </Text>
-            </Box>
+              <OrderGig gigId={gig.id} />
+            </Flex>
           </Flex>
         </Card>
       ))}

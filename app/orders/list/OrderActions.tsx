@@ -7,9 +7,6 @@ const OrderActions = () => {
   return (
     <Flex justify="between">
       <OrderStatusFilter />
-      <Button>
-        <Link href="/issues/new">New Order</Link>
-      </Button>
     </Flex>
   );
 };
