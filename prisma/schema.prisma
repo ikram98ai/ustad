@@ -74,20 +74,23 @@ enum OrderStatus {
 // }
 
 model Chat {
-  id        String   @id @default(cuid())
+  id        String     @id @default(cuid())
   senderId  String
-  sender    User     @relation("senderChats", fields: [senderId], references: [id])
-  reciverId String
-  reciver   User     @relation("reciverChats", fields: [reciverId], references: [id])
-  at        DateTime @default(now())
+  sender    User       @relation("senderChats", fields: [senderId], references: [id])
+  receiverId String
+  receiver   User       @relation("receiverChats", fields: [receiverId], references: [id])
+  at        DateTime   @default(now())
+  messages  Message[]
 
-  @@unique([reciverId, senderId])
+  @@unique([receiverId, senderId])
 }
 
 model Message {
   id       String   @id @default(cuid())
   senderId String
   sender   User     @relation(fields: [senderId], references: [id])
+  chatId   String
+  chat     Chat     @relation(fields: [chatId], references: [id])
   text     String   @db.Text
   at       DateTime @default(now())
 }
@@ -101,7 +104,7 @@ model User {
   gigs          Gig[]
   orders        Order[]
   senderChats   Chat[]    @relation("senderChats")
-  reciverChats  Chat[]    @relation("reciverChats")
+  receiverChats  Chat[]    @relation("receiverChats")
   messages      Message[]
   accounts      Account[]
   sessions      Session[]

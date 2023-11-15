@@ -1,4 +1,4 @@
-import { Avatar, Box, Card, Flex, Grid, Text } from "@radix-ui/themes";
+import { Avatar, Box, Button, Card, Flex, Grid, Text } from "@radix-ui/themes";
 import Link from "next/link";
 import React from "react";
 import { Gig } from "@prisma/client";
@@ -29,7 +29,10 @@ const GigCardList = ({ gigs }: Props) => {
               <Text as="div" size="1" color="gray">
                 ${gig.rate} {gig.job_type}
               </Text>
-              <GigOrder gigId={gig.id} />
+              <Flex gap='3'>
+                <GigOrder gigId={gig.id} />
+                <Link href="/chats/new"><Button>Chat</Button></Link>
+              </Flex>
             </Flex>
           </Flex>
         </Card>
