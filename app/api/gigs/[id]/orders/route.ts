@@ -22,11 +22,12 @@ export async function POST(
 
   const newOrder = await prisma.order.create({
     data: {
-      rate: body.rate,
+      rate: parseFloat(body.rate),
       job_type: body.job_type,
       requirements: body.requirements,
       gigId: params.id,
       userId: user!.id,
+      endAt: null,
     },
   });
 

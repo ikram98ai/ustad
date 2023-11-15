@@ -48,7 +48,7 @@ enum JobType {
 model Order {
   id           String      @id @default(cuid())
   startedAt    DateTime    @default(now())
-  endAt        DateTime?    
+  endAt        DateTime?
   rate         Float
   job_type     JobType     @default(HOURLY)
   requirements String      @db.Text
@@ -64,7 +64,7 @@ enum OrderStatus {
   CANCELLED //Customer can cancel
   REJECTED //Ustad can reject
   ACCEPTED //Ustad can accept ONLY  ORDERS 3 AT A TIME
-  COMPLETE //Agreement of both can complete
+  COMPLETED //Agreement of both can complete
 }
 
 // model Review {

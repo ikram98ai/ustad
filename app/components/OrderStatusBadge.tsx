@@ -4,11 +4,13 @@ import React from "react";
 
 const statusMap: Record<
   OrderStatus,
-  { label: string; color: "red" | "violet" | "green" }
+  { label: string; color: "orange" | "red" | "violet" | "green" }
 > = {
-  PENDING: { label: "Pending", color: "red" },
-  IN_PROGRESS: { label: "In Progress", color: "violet" },
-  COMPLETE: { label: "Complete", color: "green" },
+  PENDING: { label: "Pending", color: "orange" },
+  CANCELLED: { label: "Canceled", color: "red" },
+  REJECTED: { label: "Rejected", color: "red" },
+  ACCEPTED: { label: "In Progress", color: "violet" },
+  COMPLETED: { label: "Completed", color: "green" },
 };
 
 const OrderStatusBadge = ({ status }: { status: OrderStatus }) => {

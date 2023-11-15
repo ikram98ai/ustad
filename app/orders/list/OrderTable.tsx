@@ -6,15 +6,21 @@ import React from "react";
 import NextLink from "next/link";
 import { Order, OrderStatus } from "@prisma/client";
 
-export interface IssueQuery {
+export interface OrderQuery {
   status: OrderStatus;
   orderBy: keyof Order;
   page: string;
 }
 
+interface UserOrder extends Order {
+  user: {
+    name: string | null;
+  };
+}
+
 interface Props {
-  searchParams: IssueQuery;
-  orders: Order[];
+  searchParams: OrderQuery;
+  orders: UserOrder[];
 }
 
 const OrderTable = ({ searchParams, orders }: Props) => {
@@ -48,7 +54,7 @@ const OrderTable = ({ searchParams, orders }: Props) => {
         {orders.map((order) => (
           <Table.Row key={order.id}>
             <Table.Cell>
-              <Link href={`/orders/${order.id}`}>{order.id}</Link>
+              <Link href={`/orders/${order.id}`}>{order.user.name}</Link>
               <div className="block md:hidden">
                 <OrderStatusBadge status={order.status} />
               </div>
@@ -68,10 +74,10 @@ const OrderTable = ({ searchParams, orders }: Props) => {
 
 const columns: {
   label: string;
-  value: keyof Order;
+  value?: keyof UserOrder;
   className?: string;
 }[] = [
-  { label: "Order", value: "id" },
+  { label: "Order By" },
   {
     label: "Status",
     value: "status",

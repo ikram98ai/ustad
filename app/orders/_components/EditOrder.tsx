@@ -1,8 +1,8 @@
 "use client";
 import { ErrorMessage, Spinner } from "@/app/components";
-import { orderSchema } from "@/app/validationSchemas";
+import { patchOrderSchema } from "@/app/validationSchemas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { JobType } from "@prisma/client";
+import { JobType, Order } from "@prisma/client";
 import {
   Button,
   Dialog,
@@ -18,10 +18,11 @@ import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import toast, { Toaster } from "react-hot-toast";
+import { Pencil2Icon } from "@radix-ui/react-icons";
 
-type OrderFormData = z.infer<typeof orderSchema>;
+type OrderFormData = z.infer<typeof patchOrderSchema>;
 
-const OrderGig = ({ gigId }: { gigId: string }) => {
+const EditOrder = ({ order }: { order: Order }) => {
   const router = useRouter();
   const {
     register,
@@ -29,7 +30,7 @@ const OrderGig = ({ gigId }: { gigId: string }) => {
     handleSubmit,
     formState: { errors },
   } = useForm<OrderFormData>({
-    resolver: zodResolver(orderSchema),
+    resolver: zodResolver(patchOrderSchema),
   });
   const [isSubmitting, setSubmitting] = useState(false);
   const job_types = Object.values(JobType);
@@ -37,8 +38,8 @@ const OrderGig = ({ gigId }: { gigId: string }) => {
   const onSubmit = handleSubmit(async (data) => {
     try {
       setSubmitting(true);
-      await axios.post(`/api/gigs/${gigId}/orders`, data);
-      router.push("/orders");
+      await axios.patch(`/api/orders/${order.id}`, data);
+      router.push("/orders/list");
       router.refresh();
     } catch (error) {
       setSubmitting(false);
@@ -50,7 +51,10 @@ const OrderGig = ({ gigId }: { gigId: string }) => {
     <>
       <Dialog.Root>
         <Dialog.Trigger>
-          <Button>Order</Button>
+          <Button>
+            <Pencil2Icon />
+            Edit Order
+          </Button>
         </Dialog.Trigger>
 
         <Dialog.Content style={{ maxWidth: 450 }}>
@@ -61,6 +65,7 @@ const OrderGig = ({ gigId }: { gigId: string }) => {
                 <TextField.Root>
                   <TextField.Input
                     pattern="^\d*(\.\d{0,2})?$"
+                    defaultValue={order.rate}
                     placeholder="Rate"
                     {...register("rate")}
                   />
@@ -71,6 +76,7 @@ const OrderGig = ({ gigId }: { gigId: string }) => {
                 <Controller
                   name="job_type"
                   control={control}
+                  defaultValue={order.job_type}
                   render={({ field }) => (
                     <Select.Root {...field} onValueChange={field.onChange}>
                       <Select.Trigger placeholder="Job Type..." />
@@ -92,6 +98,7 @@ const OrderGig = ({ gigId }: { gigId: string }) => {
             </Flex>
             <TextArea
               placeholder="Requirements"
+              defaultValue={order.requirements}
               {...register("requirements")}
             />
             <ErrorMessage>{errors.requirements?.message}</ErrorMessage>
@@ -103,7 +110,7 @@ const OrderGig = ({ gigId }: { gigId: string }) => {
                 </Button>
               </Dialog.Close>
               <Button type="submit" disabled={isSubmitting}>
-                {"Request Order"} {isSubmitting && <Spinner />}
+                {"Edit Order"} {isSubmitting && <Spinner />}
               </Button>
             </Flex>
           </form>
@@ -114,4 +121,4 @@ const OrderGig = ({ gigId }: { gigId: string }) => {
   );
 };
 
-export default OrderGig;
+export default EditOrder;

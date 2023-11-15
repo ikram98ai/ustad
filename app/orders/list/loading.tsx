@@ -21,8 +21,8 @@ const LoadingOrderPage = () => {
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {orders.map((issue) => (
-            <Table.Row key={issue}>
+          {orders.map((order) => (
+            <Table.Row key={order}>
               <Table.Cell>
                 <Skeleton />
                 <div className="block md:hidden">

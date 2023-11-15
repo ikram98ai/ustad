@@ -8,10 +8,10 @@ import React from "react";
 const statuses: { label: string; value?: OrderStatus }[] = [
   { label: "All" },
   { label: "Pending", value: "PENDING" },
+  { label: "Cancelled", value: "CANCELLED" },
   { label: "Working", value: "ACCEPTED" },
   { label: "Rejected", value: "REJECTED" },
-  { label: "Cancelled", value: "CANCELLED" },
-  { label: "Completed", value: "COMPLETE" },
+  { label: "Completed", value: "COMPLETED" },
 ];
 
 const OrderStatusFilter = () => {
