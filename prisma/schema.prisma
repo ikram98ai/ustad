@@ -73,6 +73,25 @@ enum OrderStatus {
 //   review String @db.Text
 // }
 
+model Chat {
+  id        String   @id @default(cuid())
+  senderId  String
+  sender    User     @relation("senderChats", fields: [senderId], references: [id])
+  reciverId String
+  reciver   User     @relation("reciverChats", fields: [reciverId], references: [id])
+  at        DateTime @default(now())
+
+  @@unique([reciverId, senderId])
+}
+
+model Message {
+  id       String   @id @default(cuid())
+  senderId String
+  sender   User     @relation(fields: [senderId], references: [id])
+  text     String   @db.Text
+  at       DateTime @default(now())
+}
+
 model User {
   id            String    @id @default(cuid())
   name          String?
@@ -81,6 +100,9 @@ model User {
   image         String?
   gigs          Gig[]
   orders        Order[]
+  senderChats   Chat[]    @relation("senderChats")
+  reciverChats  Chat[]    @relation("reciverChats")
+  messages      Message[]
   accounts      Account[]
   sessions      Session[]
 }
