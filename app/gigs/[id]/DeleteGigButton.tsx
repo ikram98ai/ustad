@@ -15,7 +15,7 @@ const DeleteGigButton = ({ gigId }: { gigId: string }) => {
     try {
       setDeleting(true);
       await axios.delete("/api/gigs/" + gigId);
-      router.push("/gigs/list");
+      router.push("/");
       router.refresh();
     } catch (error) {
       setDeleting(false);

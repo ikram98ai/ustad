@@ -2,7 +2,7 @@ import { Avatar, Box, Button, Card, Flex, Grid, Text } from "@radix-ui/themes";
 import Link from "next/link";
 import React from "react";
 import { Gig } from "@prisma/client";
-import GigOrder from "../_components/GigOrder";
+import GigOrder from "./GigOrder";
 
 interface Props {
   gigs: Gig[];
@@ -31,7 +31,6 @@ const GigCardList = ({ gigs }: Props) => {
               </Text>
               <Flex gap="3">
                 <GigOrder gigId={gig.id} />
-              
               </Flex>
             </Flex>
           </Flex>

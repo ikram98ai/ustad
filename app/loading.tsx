@@ -1,6 +1,6 @@
 import { Skeleton } from "@/app/components";
 import { Table } from "@radix-ui/themes";
-import GigActions from "./GigActions";
+import GigActions from "./gigs/_components/GigActions";
 
 const LoadinggigsPage = () => {
   const gigs = [1, 2, 3, 4, 5];

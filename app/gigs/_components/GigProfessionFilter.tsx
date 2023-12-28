@@ -15,7 +15,7 @@ const GigProfessionFilter = ({
 
   return (
     <Select.Root
-      defaultValue={searchParams.get("profession") || ''}
+      defaultValue={searchParams.get("profession") || ""}
       onValueChange={(profession) => {
         const params = new URLSearchParams();
         if (profession) params.append("profession", profession);
@@ -23,7 +23,7 @@ const GigProfessionFilter = ({
           params.append("orderBy", searchParams.get("orderBy")!);
 
         const query = params.size ? "?" + params.toString() : "";
-        router.push("/gigs/list" + query);
+        router.push("/" + query);
       }}
     >
       <Select.Trigger placeholder="Profession..." />

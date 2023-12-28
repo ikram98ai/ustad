@@ -50,7 +50,7 @@ const GigForm = ({
       setSubmitting(true);
       if (gig) await axios.patch("/api/gigs/" + gig.id, data);
       else await axios.post("/api/gigs", data);
-      router.push("/gigs/list");
+      router.push("/");
       router.refresh();
     } catch (error) {
       setSubmitting(false);

@@ -9,7 +9,6 @@ const NavBtm = () => {
   const { status, data: session } = useSession();
   const links = [
     { label: "Home", href: "/" },
-    { label: "Gigs", href: "/gigs/list" },
     { label: "Orders", href: "/orders/list" },
     { label: "Profile", href: "/profile" },
   ];
