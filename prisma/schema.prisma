@@ -10,6 +10,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
 model Profession {
   id    String @id @default(cuid())
   title String @unique @db.VarChar(255)

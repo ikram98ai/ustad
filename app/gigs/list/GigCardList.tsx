@@ -29,9 +29,9 @@ const GigCardList = ({ gigs }: Props) => {
               <Text as="div" size="1" color="gray">
                 ${gig.rate} {gig.job_type}
               </Text>
-              <Flex gap='3'>
+              <Flex gap="3">
                 <GigOrder gigId={gig.id} />
-                <Link href="/chats/new"><Button>Chat</Button></Link>
+              
               </Flex>
             </Flex>
           </Flex>

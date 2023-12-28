@@ -11,7 +11,6 @@ const NavBtm = () => {
     { label: "Home", href: "/" },
     { label: "Gigs", href: "/gigs/list" },
     { label: "Orders", href: "/orders/list" },
-    { label: "Chats", href: "/chats" },
     { label: "Profile", href: "/profile" },
   ];
   return (
