@@ -5,7 +5,6 @@ import { formatRate } from "@/app/lib/format";
 import { formatDistance, haversineKm, LatLng } from "@/app/lib/geo";
 import { Avatar, Button } from "@radix-ui/themes";
 import cn from "classnames";
-import Link from "next/link";
 import { useState } from "react";
 import { FaLocationDot, FaMapLocationDot } from "react-icons/fa6";
 import { ExploreGig } from "./types";
@@ -16,6 +15,7 @@ interface Props {
   gigs: ExploreGig[];
   userLocation: LatLng | null;
   selectedId: string | null;
+  onOpenDetail: (gig: ExploreGig) => void;
   onShowOnMap: (id: string) => void;
   onReset: () => void;
 }
@@ -24,6 +24,7 @@ const GigList = ({
   gigs,
   userLocation,
   selectedId,
+  onOpenDetail,
   onShowOnMap,
   onReset,
 }: Props) => {
@@ -74,12 +75,13 @@ const GigList = ({
               />
               <div className="min-w-0 flex-1">
                 <div className="flex items-baseline justify-between gap-3">
-                  <Link
-                    href={`/gigs/${gig.id}`}
-                    className="truncate font-semibold hover:underline after:absolute after:inset-0"
+                  <button
+                    type="button"
+                    onClick={() => onOpenDetail(gig)}
+                    className="truncate text-left font-semibold hover:underline after:absolute after:inset-0"
                   >
                     {gig.title}
-                  </Link>
+                  </button>
                   <span className="shrink-0 font-bold">
                     {formatRate(gig.rate, gig.job_type)}
                   </span>
@@ -105,7 +107,7 @@ const GigList = ({
             </div>
 
             <div className="relative z-10 mt-3 flex items-center gap-2 border-t border-gray-100 pt-3">
-              <GigOrder gigId={gig.id} />
+              <GigOrder gigId={gig.id} ownerId={gig.userId} />
               {gig.latitude != null && (
                 <button
                   type="button"

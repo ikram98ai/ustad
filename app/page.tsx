@@ -3,20 +3,13 @@ import { Metadata } from "next";
 import Explore from "./components/explore/Explore";
 
 const GigsHome = async () => {
-  const [professions, gigs] = await Promise.all([
-    prisma.profession.findMany({ orderBy: { title: "asc" } }),
-    prisma.gig.findMany({
-      where: { is_active: true },
-      orderBy: { created_at: "desc" },
-      take: 200,
-      include: {
-        user: { select: { name: true, image: true } },
-        profession: { select: { title: true } },
-      },
-    }),
-  ]);
+  // Gigs themselves load client-side for just the visible map area — the
+  // initial view only fetches pros near the user (see Explore).
+  const professions = await prisma.profession.findMany({
+    orderBy: { title: "asc" },
+  });
 
-  return <Explore professions={professions} initialGigs={gigs} />;
+  return <Explore professions={professions} />;
 };
 
 export const dynamic = "force-dynamic";

@@ -56,7 +56,7 @@ const SearchFilterBar = ({
     (filters.sort !== "recommended" ? 1 : 0);
 
   return (
-    <div className="sticky top-14 z-30 -mx-4 flex flex-col gap-2.5 bg-white/95 px-4 py-2.5 backdrop-blur">
+    <div className="flex shrink-0 flex-col gap-2.5 py-1">
       <div className="flex items-center gap-2">
         <div className="flex h-11 flex-1 items-center gap-2.5 rounded-full bg-gray-100 px-4 transition focus-within:ring-2 focus-within:ring-ink">
           <FaMagnifyingGlass size={14} className="shrink-0 text-gray-500" />
@@ -172,7 +172,7 @@ const SearchFilterBar = ({
         </Dialog.Root>
       </div>
 
-      <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 py-0.5">
+      <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 py-0.5 lg:mx-0 lg:px-0">
         <Chip
           active={!filters.professionId}
           onClick={() => onChange({ professionId: "" })}

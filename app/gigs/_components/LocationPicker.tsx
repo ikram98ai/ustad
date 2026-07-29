@@ -80,12 +80,12 @@ const LocationPicker = ({ value, onChange }: Props) => {
       <button
         type="button"
         onClick={useMyLocation}
-        className="absolute right-2 top-2 z-[1000] flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-xs font-semibold shadow-md transition hover:bg-gray-50"
+        className="absolute right-2 top-2 z-1000 flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-xs font-semibold shadow-md transition hover:bg-gray-50"
       >
         <FaLocationCrosshairs size={12} />
         Use my location
       </button>
-      <p className="absolute bottom-2 left-2 z-[1000] rounded-full bg-white/90 px-3 py-1 text-xs text-gray-600 shadow-sm">
+      <p className="absolute bottom-2 left-2 z-1000 rounded-full bg-white/90 px-3 py-1 text-xs text-gray-600 shadow-sm">
         {value
           ? `Pinned at ${value.lat.toFixed(4)}, ${value.lng.toFixed(4)}`
           : "Tap the map to drop your pin"}

@@ -1,14 +1,22 @@
 "use client";
 
-import { haversineKm, LatLng } from "@/app/lib/geo";
+import {
+  boundsAround,
+  DEFAULT_CENTER,
+  haversineKm,
+  LatLng,
+  MapBounds,
+  viewportLeftSearchedArea,
+} from "@/app/lib/geo";
 import { Profession } from "@/prisma/models";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import cn from "classnames";
 import dynamic from "next/dynamic";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
-import { FaListUl, FaMap } from "react-icons/fa6";
+import { FaListUl, FaMap, FaRotateRight } from "react-icons/fa6";
+import GigDetailModal from "./GigDetailModal";
 import GigList from "./GigList";
 import SearchFilterBar from "./SearchFilterBar";
 import { DEFAULT_FILTERS, ExploreGig, GigFilters } from "./types";
@@ -27,29 +35,69 @@ const SORT_LABEL: Record<GigFilters["sort"], string> = {
 
 interface Props {
   professions: Profession[];
-  initialGigs: ExploreGig[];
 }
 
-const Explore = ({ professions, initialGigs }: Props) => {
+const Explore = ({ professions }: Props) => {
   const [filters, setFilters] = useState<GigFilters>(DEFAULT_FILTERS);
   const [debouncedQ, setDebouncedQ] = useState("");
   const [userLocation, setUserLocation] = useState<LatLng | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [detailGig, setDetailGig] = useState<ExploreGig | null>(null);
   const [mobileView, setMobileView] = useState<"list" | "map">("list");
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  // Area-based loading: gigs are fetched only for `searchedBounds`. The next
+  // bounds the map reports are auto-adopted when the ref is set (initial load
+  // and after "near me"); any later camera move just tracks `currentBounds`
+  // until the user explicitly hits "Search this area".
+  const [searchedBounds, setSearchedBounds] = useState<MapBounds | null>(null);
+  const [currentBounds, setCurrentBounds] = useState<MapBounds | null>(null);
+  const adoptNextBounds = useRef(true);
 
   useEffect(() => {
     const t = setTimeout(() => setDebouncedQ(filters.q.trim()), 350);
     return () => clearTimeout(t);
   }, [filters.q]);
 
+  // Try to start centered on the user so only nearby pros are loaded first.
+  // Silent on failure — the map then loads around the default city center.
+  useEffect(() => {
+    if (!("geolocation" in navigator)) return;
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        adoptNextBounds.current = true;
+        setUserLocation(loc);
+        // Search near the user right away, even while the map is hidden
+        // (mobile list view); a visible map refines this with real bounds.
+        setSearchedBounds(boundsAround(loc));
+      },
+      () => {},
+      { maximumAge: 300_000, timeout: 8_000 }
+    );
+  }, []);
+
+  // Fallback when the map never reports (hidden on mobile) and geolocation
+  // hasn't answered: search around the default center so the list still loads.
+  useEffect(() => {
+    if (searchedBounds) return;
+    const t = setTimeout(
+      () => setSearchedBounds((prev) => prev ?? boundsAround(DEFAULT_CENTER)),
+      1200
+    );
+    return () => clearTimeout(t);
+  }, [searchedBounds]);
+
+  useEffect(() => {
+    if (!isFullscreen) return;
+    const onKey = (e: KeyboardEvent) =>
+      e.key === "Escape" && setIsFullscreen(false);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [isFullscreen]);
+
   // "nearest" is sorted client-side; keep the API sort stable for it.
   const apiSort = filters.sort === "nearest" ? "recommended" : filters.sort;
-  const isDefaultQuery =
-    !debouncedQ &&
-    !filters.professionId &&
-    !filters.jobType &&
-    !filters.maxRate &&
-    apiSort === "recommended";
 
   const { data: gigs, isFetching } = useQuery<ExploreGig[]>({
     queryKey: [
@@ -59,6 +107,7 @@ const Explore = ({ professions, initialGigs }: Props) => {
       filters.jobType,
       filters.maxRate,
       apiSort,
+      searchedBounds,
     ],
     queryFn: () =>
       axios
@@ -69,10 +118,11 @@ const Explore = ({ professions, initialGigs }: Props) => {
             jobType: filters.jobType || undefined,
             maxRate: filters.maxRate || undefined,
             sort: apiSort,
+            ...searchedBounds,
           },
         })
         .then((res) => res.data),
-    initialData: isDefaultQuery ? initialGigs : undefined,
+    enabled: !!searchedBounds,
     placeholderData: keepPreviousData,
     staleTime: 30_000,
   });
@@ -116,67 +166,142 @@ const Explore = ({ professions, initialGigs }: Props) => {
     setMobileView("map");
   };
 
+  const handleBoundsChange = (bounds: MapBounds) => {
+    setCurrentBounds(bounds);
+    if (adoptNextBounds.current) {
+      adoptNextBounds.current = false;
+      setSearchedBounds(bounds);
+    }
+  };
+
+  const showSearchArea =
+    !!searchedBounds &&
+    !!currentBounds &&
+    viewportLeftSearchedArea(searchedBounds, currentBounds);
+
+  const searchThisArea = () => {
+    if (!currentBounds) return;
+    setSelectedId(null);
+    setSearchedBounds(currentBounds);
+  };
+
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex h-full min-h-0 flex-col">
       <SearchFilterBar
         filters={filters}
         professions={professions}
         hasLocation={!!userLocation}
         onChange={patchFilters}
-        onNearMe={() => locate(() => patchFilters({ sort: "nearest" }))}
+        onNearMe={() =>
+          locate(() => {
+            adoptNextBounds.current = true;
+            patchFilters({ sort: "nearest" });
+          })
+        }
       />
 
-      <div className="lg:grid lg:grid-cols-[420px_minmax(0,1fr)] lg:items-start lg:gap-5">
-        <section className={cn(mobileView === "map" && "hidden", "lg:block")}>
-          <div className="mb-2 flex items-center justify-between px-1 text-sm text-gray-500">
+      <div className="mt-2 flex min-h-0 flex-1 flex-col lg:grid lg:grid-cols-[420px_minmax(0,1fr)] lg:gap-5">
+        <section
+          className={cn(
+            mobileView === "map" && "hidden",
+            "flex min-h-0 flex-1 flex-col lg:flex"
+          )}
+        >
+          <div className="mb-2 flex shrink-0 items-center justify-between px-1 text-sm text-gray-500">
             <span>
-              {sortedGigs.length} {sortedGigs.length === 1 ? "pro" : "pros"}{" "}
-              available
-              {isFetching && " · updating…"}
+              {!gigs
+                ? "Finding pros in your area…"
+                : `${sortedGigs.length} ${
+                    sortedGigs.length === 1 ? "pro" : "pros"
+                  } in this area${isFetching ? " · updating…" : ""}`}
             </span>
             <span>{SORT_LABEL[filters.sort]}</span>
           </div>
-          <GigList
-            gigs={sortedGigs}
-            userLocation={userLocation}
-            selectedId={selectedId}
-            onShowOnMap={showOnMap}
-            onReset={() => setFilters(DEFAULT_FILTERS)}
-          />
+          <div className="min-h-0 flex-1 overflow-y-auto pb-4 lg:pr-2">
+            {!gigs ? (
+              <div className="space-y-3">
+                {[1, 2, 3, 4].map((n) => (
+                  <div
+                    key={n}
+                    className="h-28 animate-pulse rounded-2xl bg-gray-100"
+                  />
+                ))}
+              </div>
+            ) : (
+              <GigList
+                gigs={sortedGigs}
+                userLocation={userLocation}
+                selectedId={selectedId}
+                onOpenDetail={setDetailGig}
+                onShowOnMap={showOnMap}
+                onReset={() => setFilters(DEFAULT_FILTERS)}
+              />
+            )}
+          </div>
         </section>
 
         <section
           className={cn(
-            mobileView === "list" && "hidden",
-            "h-[calc(100dvh-21rem)] min-h-80 overflow-hidden rounded-2xl border border-gray-200 shadow-sm",
-            "lg:sticky lg:top-17 lg:block lg:h-[calc(100dvh-6.5rem)]"
+            "relative",
+            isFullscreen
+              ? "fixed inset-0 z-70 bg-white"
+              : cn(
+                  mobileView === "list" && "hidden lg:block",
+                  "min-h-0 flex-1 overflow-hidden rounded-2xl border border-gray-200 shadow-sm"
+                )
           )}
         >
           <GigMap
             gigs={sortedGigs}
             selectedId={selectedId}
             userLocation={userLocation}
+            isFullscreen={isFullscreen}
             onSelect={setSelectedId}
-            onLocate={() => locate()}
+            onOpenDetail={setDetailGig}
+            onLocate={() =>
+              locate(() => {
+                adoptNextBounds.current = true;
+              })
+            }
+            onToggleFullscreen={() => setIsFullscreen((f) => !f)}
+            onBoundsChange={handleBoundsChange}
           />
+          {showSearchArea && (
+            <button
+              type="button"
+              onClick={searchThisArea}
+              className="absolute left-1/2 top-3 z-1000 flex -translate-x-1/2 items-center gap-2 rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white shadow-xl transition hover:bg-ink-soft active:scale-95"
+            >
+              <FaRotateRight size={12} className={cn(isFetching && "animate-spin")} />
+              Search this area
+            </button>
+          )}
         </section>
       </div>
 
-      <button
-        type="button"
-        onClick={() => setMobileView(mobileView === "list" ? "map" : "list")}
-        className="fixed bottom-20 left-1/2 z-40 flex -translate-x-1/2 items-center gap-2 rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white shadow-xl transition active:scale-95 lg:hidden"
-      >
-        {mobileView === "list" ? (
-          <>
-            <FaMap size={14} /> Map
-          </>
-        ) : (
-          <>
-            <FaListUl size={14} /> List
-          </>
-        )}
-      </button>
+      {!isFullscreen && (
+        <button
+          type="button"
+          onClick={() => setMobileView(mobileView === "list" ? "map" : "list")}
+          className="fixed bottom-20 left-1/2 z-40 flex -translate-x-1/2 items-center gap-2 rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white shadow-xl transition active:scale-95 lg:hidden"
+        >
+          {mobileView === "list" ? (
+            <>
+              <FaMap size={14} /> Map
+            </>
+          ) : (
+            <>
+              <FaListUl size={14} /> List
+            </>
+          )}
+        </button>
+      )}
+
+      <GigDetailModal
+        gig={detailGig}
+        userLocation={userLocation}
+        onClose={() => setDetailGig(null)}
+      />
     </div>
   );
 };

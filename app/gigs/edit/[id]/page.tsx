@@ -1,4 +1,5 @@
 import React from "react";
+import PageContainer from "@/app/components/PageContainer";
 import prisma from "@/prisma/client";
 import { notFound } from "next/navigation";
 import GigForm from "@/app/gigs/_components/GigFormLazy";
@@ -16,7 +17,11 @@ const EditGigPage = async ({ params }: Props) => {
   if (!gig) notFound();
 
   const professions = await prisma.profession.findMany();
-  return <GigForm gig={gig} professions={professions} />;
+  return (
+    <PageContainer>
+      <GigForm gig={gig} professions={professions} />
+    </PageContainer>
+  );
 };
 
 export default EditGigPage;

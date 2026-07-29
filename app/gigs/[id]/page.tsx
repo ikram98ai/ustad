@@ -1,3 +1,4 @@
+import PageContainer from "@/app/components/PageContainer";
 import prisma from "@/prisma/client";
 import { Box, Flex, Grid } from "@radix-ui/themes";
 import { notFound } from "next/navigation";
@@ -33,6 +34,7 @@ const GigDetailPage = async ({ params }: Props) => {
   if (!gig) notFound();
 
   return (
+    <PageContainer>
     <Grid columns={{ initial: "1", sm: "5" }} gap="5">
       <Box className="md:col-span-4">
         <GigDetails gig={gig} />
@@ -55,6 +57,7 @@ const GigDetailPage = async ({ params }: Props) => {
         </Box>
       )}
     </Grid>
+    </PageContainer>
   );
 };
 

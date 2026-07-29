@@ -23,3 +23,42 @@ export function formatDistance(km: number): string {
   if (km < 1) return `${Math.round(km * 1000)} m`;
   return `${km < 10 ? km.toFixed(1) : Math.round(km)} km`;
 }
+
+export interface MapBounds {
+  north: number;
+  south: number;
+  east: number;
+  west: number;
+}
+
+/** A viewport-sized box around a point, for searching without a visible map. */
+export function boundsAround(center: LatLng, radiusKm = 10): MapBounds {
+  const dLat = radiusKm / 111;
+  const dLng = radiusKm / (111 * Math.cos((center.lat * Math.PI) / 180));
+  return {
+    north: center.lat + dLat,
+    south: center.lat - dLat,
+    east: center.lng + dLng,
+    west: center.lng - dLng,
+  };
+}
+
+/**
+ * True when the current viewport extends meaningfully outside the area that
+ * was last searched — i.e. the user panned away or zoomed out, so the loaded
+ * results no longer cover what they're looking at. Zooming further into the
+ * searched area never triggers it (those results are already loaded).
+ */
+export function viewportLeftSearchedArea(
+  searched: MapBounds,
+  current: MapBounds
+): boolean {
+  const latPad = (searched.north - searched.south) * 0.15;
+  const lngPad = (searched.east - searched.west) * 0.15;
+  return (
+    current.north > searched.north + latPad ||
+    current.south < searched.south - latPad ||
+    current.east > searched.east + lngPad ||
+    current.west < searched.west - lngPad
+  );
+}

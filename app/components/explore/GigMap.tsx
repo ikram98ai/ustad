@@ -2,13 +2,17 @@
 
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MapContainer, Marker, TileLayer, useMap } from "react-leaflet";
 import { Avatar } from "@radix-ui/themes";
-import { FaLocationCrosshairs, FaXmark } from "react-icons/fa6";
+import {
+  FaCompress,
+  FaExpand,
+  FaLocationCrosshairs,
+  FaXmark,
+} from "react-icons/fa6";
 import { formatRate } from "@/app/lib/format";
-import { DEFAULT_CENTER, DEFAULT_ZOOM, LatLng } from "@/app/lib/geo";
+import { DEFAULT_CENTER, DEFAULT_ZOOM, LatLng, MapBounds } from "@/app/lib/geo";
 import { ExploreGig } from "./types";
 
 const TILE_URL =
@@ -37,10 +41,12 @@ const MapEffects = ({
   located,
   selected,
   userLocation,
+  onBoundsChange,
 }: {
   located: ExploreGig[];
   selected: ExploreGig | null;
   userLocation: LatLng | null;
+  onBoundsChange: (bounds: MapBounds) => void;
 }) => {
   const map = useMap();
   const idsSignature = located.map((g) => g.id).join(",");
@@ -100,6 +106,27 @@ const MapEffects = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userLocation?.lat, userLocation?.lng, ready]);
 
+  // Report the visible area (once ready, then after every camera move) so
+  // Explore can load only the gigs inside it.
+  useEffect(() => {
+    if (!ready) return;
+    const report = () => {
+      const b = map.getBounds();
+      onBoundsChange({
+        north: b.getNorth(),
+        south: b.getSouth(),
+        east: b.getEast(),
+        west: b.getWest(),
+      });
+    };
+    report();
+    map.on("moveend", report);
+    return () => {
+      map.off("moveend", report);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, map]);
+
   return null;
 };
 
@@ -107,16 +134,24 @@ interface Props {
   gigs: ExploreGig[];
   selectedId: string | null;
   userLocation: LatLng | null;
+  isFullscreen: boolean;
   onSelect: (id: string | null) => void;
+  onOpenDetail: (gig: ExploreGig) => void;
   onLocate: () => void;
+  onToggleFullscreen: () => void;
+  onBoundsChange: (bounds: MapBounds) => void;
 }
 
 const GigMap = ({
   gigs,
   selectedId,
   userLocation,
+  isFullscreen,
   onSelect,
+  onOpenDetail,
   onLocate,
+  onToggleFullscreen,
+  onBoundsChange,
 }: Props) => {
   const mapRef = useRef<L.Map | null>(null);
 
@@ -141,6 +176,7 @@ const GigMap = ({
           located={located}
           selected={selected}
           userLocation={userLocation}
+          onBoundsChange={onBoundsChange}
         />
         {userLocation && (
           <Marker
@@ -160,17 +196,27 @@ const GigMap = ({
         ))}
       </MapContainer>
 
-      <button
-        type="button"
-        aria-label="Center on my location"
-        onClick={onLocate}
-        className="absolute right-3 top-3 z-[1000] grid h-10 w-10 place-items-center rounded-full bg-white text-ink shadow-md transition hover:bg-gray-50"
-      >
-        <FaLocationCrosshairs size={16} />
-      </button>
+      <div className="absolute right-3 top-3 z-1000 flex flex-col gap-2">
+        <button
+          type="button"
+          aria-label="Center on my location"
+          onClick={onLocate}
+          className="grid h-10 w-10 place-items-center rounded-full bg-white text-ink shadow-md transition hover:bg-gray-50"
+        >
+          <FaLocationCrosshairs size={16} />
+        </button>
+        <button
+          type="button"
+          aria-label={isFullscreen ? "Exit full screen" : "Full screen"}
+          onClick={onToggleFullscreen}
+          className="grid h-10 w-10 place-items-center rounded-full bg-white text-ink shadow-md transition hover:bg-gray-50"
+        >
+          {isFullscreen ? <FaCompress size={15} /> : <FaExpand size={15} />}
+        </button>
+      </div>
 
       {selected && (
-        <div className="absolute inset-x-3 bottom-3 z-[1000] rounded-2xl bg-white p-3 shadow-xl">
+        <div className="absolute inset-x-3 bottom-16 z-1000 rounded-2xl bg-white p-3 shadow-xl lg:bottom-3">
           <div className="flex items-center gap-3">
             <Avatar
               size="3"
@@ -189,12 +235,13 @@ const GigMap = ({
             <span className="shrink-0 font-bold">
               {formatRate(selected.rate, selected.job_type)}
             </span>
-            <Link
-              href={`/gigs/${selected.id}`}
+            <button
+              type="button"
+              onClick={() => onOpenDetail(selected)}
               className="shrink-0 rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white transition hover:bg-ink-soft"
             >
               View
-            </Link>
+            </button>
             <button
               type="button"
               aria-label="Close"

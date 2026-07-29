@@ -13,6 +13,7 @@ import {
   TextArea,
 } from "@radix-ui/themes";
 import axios from "axios";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -21,8 +22,17 @@ import toast from "react-hot-toast";
 
 type OrderFormData = z.infer<typeof orderSchema>;
 
-const GigOrder = ({ gigId }: { gigId: string }) => {
+interface Props {
+  gigId: string;
+  // When provided, the button hides for the gig's own owner — you can't
+  // order your own gig (the API rejects it too).
+  ownerId?: string;
+}
+
+const GigOrder = ({ gigId, ownerId }: Props) => {
   const router = useRouter();
+  const { data: session } = useSession();
+  const isOwnGig = !!ownerId && session?.user.id === ownerId;
   const {
     register,
     control,
@@ -45,6 +55,8 @@ const GigOrder = ({ gigId }: { gigId: string }) => {
       toast.error("An unexpected error occurred.");
     }
   });
+
+  if (isOwnGig) return null;
 
   return (
     <>
