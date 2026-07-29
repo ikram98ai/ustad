@@ -53,7 +53,7 @@ const NavBtm = () => {
   ];
 
   return (
-    <nav className="dock z-40 border-t border-gray-200 bg-white/95 backdrop-blur">
+    <nav className="dock z-40 border-t border-gray-200 bg-white/95 backdrop-blur lg:hidden">
       {links.map((link) => {
         const isActive =
           link.root === "/"
