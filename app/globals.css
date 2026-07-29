@@ -1,24 +1,139 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-:root {
-  /* this is 255 is temp beacaue of not showing text in dev */
-  --foreground-rgb: 0, 0, 0;
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+@plugin "daisyui" {
+  themes: winter --default;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 0, 0, 0;
-  }
+/*
+ * Brand tokens — Uber-style high-contrast palette.
+ * ink: primary actions / pins / text. safety: brand yellow accent (hard hat).
+ * brand: logo navy, reserved for the wordmark.
+ */
+@theme {
+  --color-ink: #14181f;
+  --color-ink-soft: #2a303c;
+  --color-brand: #1f3a5f;
+  --color-safety: #ffd100;
+  --color-surface: #f6f6f6;
+}
+
+/* Re-skin daisyUI (winter) to the same palette so chat bubbles,
+   dock, badges etc. match the rest of the app. */
+:root {
+  --color-primary: oklch(22% 0.02 264);
+  --color-primary-content: oklch(98% 0 0);
+  --color-secondary: oklch(33% 0.06 259);
+  --color-secondary-content: oklch(98% 0 0);
+  --color-accent: oklch(87% 0.17 92);
+  --color-accent-content: oklch(24% 0.02 264);
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
+  color: var(--color-ink);
+  background: #fff;
 }
 
 @layer base {
   h1 {
-    @apply font-extrabold text-2xl mb-3;
+    @apply font-extrabold text-2xl tracking-tight mb-3;
+  }
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ---------- Map (Leaflet) ---------- */
+
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  font-family: inherit;
+  background: #e8e8e8;
+}
+
+/* Price-pill marker, Uber/Airbnb style. Anchored by its stem tip. */
+.gig-pin {
+  display: inline-flex;
+  align-items: center;
+  background: #14181f;
+  color: #fff;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 1;
+  padding: 7px 10px;
+  border-radius: 999px;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.35);
+  white-space: nowrap;
+  width: max-content;
+  position: relative;
+  transform: translate(-50%, calc(-100% - 6px));
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+.gig-pin::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -7px;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #14181f;
+  border-bottom: 0;
+}
+.gig-pin:hover {
+  transform: translate(-50%, calc(-100% - 6px)) scale(1.08);
+}
+.gig-pin-active {
+  background: #ffd100;
+  color: #14181f;
+  border-color: #14181f;
+}
+.gig-pin-active::after {
+  border-top-color: #ffd100;
+}
+
+/* Small round pin used by the location picker */
+.picker-pin {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #14181f;
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 2px rgb(20 24 31 / 0.25), 0 2px 6px rgb(0 0 0 / 0.35);
+  transform: translate(-50%, -50%);
+}
+
+/* Rider-style pulsing "you are here" dot */
+.user-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #276ef1;
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 2px rgb(39 110 241 / 0.35), 0 2px 6px rgb(0 0 0 / 0.3);
+  position: relative;
+  transform: translate(-50%, -50%);
+}
+.user-dot::before {
+  content: "";
+  position: absolute;
+  inset: -12px;
+  border-radius: 50%;
+  background: rgb(39 110 241 / 0.2);
+  animation: user-pulse 2s ease-out infinite;
+}
+@keyframes user-pulse {
+  0% {
+    transform: scale(0.4);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.3);
+    opacity: 0;
   }
 }

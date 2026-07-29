@@ -1,54 +1,30 @@
-import Pagination from "@/app/components/Pagination";
 import prisma from "@/prisma/client";
-import GigActions from "./gigs/_components/GigActions";
-import GigCardList from "./gigs/_components/GigCardList";
-import { Flex } from "@radix-ui/themes";
 import { Metadata } from "next";
+import Explore from "./components/explore/Explore";
 
-export interface gigQuery {
-  profession: string | undefined;
-  page: string;
-}
+const GigsHome = async () => {
+  const [professions, gigs] = await Promise.all([
+    prisma.profession.findMany({ orderBy: { title: "asc" } }),
+    prisma.gig.findMany({
+      where: { is_active: true },
+      orderBy: { created_at: "desc" },
+      take: 200,
+      include: {
+        user: { select: { name: true, image: true } },
+        profession: { select: { title: true } },
+      },
+    }),
+  ]);
 
-interface Props {
-  searchParams: gigQuery;
-}
-
-const GigsHome = async ({ searchParams }: Props) => {
-  const profession = searchParams.profession
-    ? await prisma.profession.findUnique({
-        where: { title: searchParams.profession },
-        select: { id: true },
-      })
-    : undefined;
-
-  const where = { is_active: true, professionId: profession?.id };
-
-  const page = parseInt(searchParams.page) || 1;
-  const pageSize = 40;
-
-  const gigs = await prisma.gig.findMany({
-    where,
-    skip: (page - 1) * pageSize,
-    take: pageSize,
-  });
-
-  const gigCount = await prisma.gig.count({ where });
-
-  return (
-    <Flex direction="column" gap="3">
-      <GigActions />
-      <GigCardList gigs={gigs} />
-      <Pagination pageSize={pageSize} currentPage={page} itemCount={gigCount} />
-    </Flex>
-  );
+  return <Explore professions={professions} initialGigs={gigs} />;
 };
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "gig Tracker - gig List",
-  description: "View all project gigs",
+  title: "Find an Ustad",
+  description:
+    "Find skilled local pros on the map — search, filter and hire the perfect match near you.",
 };
 
 export default GigsHome;
