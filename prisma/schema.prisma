@@ -2,12 +2,12 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output   = "./generated"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 
@@ -23,6 +23,9 @@ model Gig {
   description  String     @db.Text
   rate         Float
   range        Float
+  latitude     Float?
+  longitude    Float?
+  address      String?    @db.VarChar(255)
   created_at   DateTime   @default(now())
   is_active    Boolean    @default(true)
   job_type     JobType    @default(FIX)
@@ -31,6 +34,8 @@ model Gig {
   userId       String     @db.VarChar(255)
   user         User       @relation(fields: [userId], references: [id])
   orders       Order[]
+
+  @@index([latitude, longitude])
 }
 
 enum JobType {
