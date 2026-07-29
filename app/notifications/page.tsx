@@ -1,7 +1,7 @@
 "use client";
 import { getSocket } from "@/app/chats/socket";
 import { Skeleton } from "@/app/components";
-import { Notification } from "@prisma/client";
+import { Notification } from "@/prisma/models";
 import { Card, Flex, Heading, Text } from "@radix-ui/themes";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
@@ -42,6 +42,9 @@ const NotificationsPage = () => {
 
   useEffect(() => {
     if (!data || freshIds) return;
+    // Intentional one-time snapshot of the unread ids from the first fetch,
+    // so the "new" highlight survives the mark-all-read call below.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setFreshIds(
       new Set(data.notifications.filter((n) => !n.is_read).map((n) => n.id))
     );
@@ -118,3 +121,5 @@ const NotificationsPage = () => {
 };
 
 export default NotificationsPage;
+
+export const dynamic = "force-dynamic";

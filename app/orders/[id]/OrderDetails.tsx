@@ -1,5 +1,5 @@
 import { OrderStatusBadge } from "@/app/components";
-import { Order } from "@prisma/client";
+import { Order } from "@/prisma/models";
 import { Card, Flex, Heading, Text } from "@radix-ui/themes";
 import ReactMarkdown from "react-markdown";
 

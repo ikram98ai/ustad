@@ -1,11 +1,11 @@
 "use client";
 import { Spinner } from "@/app/components";
-import { Chat } from "@prisma/client";
+import { Chat } from "@/prisma/models";
 import { Button } from "@radix-ui/themes";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 
 const ChatButton = ({ receiverId }: { receiverId: string }) => {
   const router = useRouter();
@@ -29,7 +29,6 @@ const ChatButton = ({ receiverId }: { receiverId: string }) => {
       <Button onClick={startChat} disabled={isLoading}>
         Chat with Ustad {isLoading && <Spinner />}
       </Button>
-      <Toaster />
     </>
   );
 };

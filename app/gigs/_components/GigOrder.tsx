@@ -2,7 +2,7 @@
 import { ErrorMessage, Spinner } from "@/app/components";
 import { orderSchema } from "@/app/validationSchemas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { JobType } from "@prisma/client";
+import { JobType } from "@/prisma/models";
 import {
   Button,
   Dialog,
@@ -17,7 +17,7 @@ import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 
 type OrderFormData = z.infer<typeof orderSchema>;
 
@@ -50,7 +50,7 @@ const GigOrder = ({ gigId }: { gigId: string }) => {
     <>
       <Dialog.Root>
         <Dialog.Trigger>
-          <Button>Order</Button>
+          <Button highContrast>Order</Button>
         </Dialog.Trigger>
 
         <Dialog.Content style={{ maxWidth: 450 }}>
@@ -58,13 +58,11 @@ const GigOrder = ({ gigId }: { gigId: string }) => {
           <form className="space-y-3" onSubmit={onSubmit}>
             <Flex gap="3">
               <Box>
-                <TextField.Root>
-                  <TextField.Input
-                    pattern="^\d*(\.\d{0,2})?$"
-                    placeholder="Rate"
-                    {...register("rate")}
-                  />
-                </TextField.Root>
+                <TextField.Root
+                  pattern="^\d*(\.\d{0,2})?$"
+                  placeholder="Rate"
+                  {...register("rate")}
+                />
                 <ErrorMessage>{errors.rate?.message}</ErrorMessage>
               </Box>
               <Box>
@@ -102,14 +100,13 @@ const GigOrder = ({ gigId }: { gigId: string }) => {
                   Cancel
                 </Button>
               </Dialog.Close>
-              <Button type="submit" disabled={isSubmitting}>
+              <Button highContrast type="submit" disabled={isSubmitting}>
                 {"Request Order"} {isSubmitting && <Spinner />}
               </Button>
             </Flex>
           </form>
         </Dialog.Content>
       </Dialog.Root>
-      <Toaster />
     </>
   );
 };

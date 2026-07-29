@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import ChatRoom from "../_components/ChatRoom";
 
 interface Props {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 const ChatDetailPage = async ({ params }: Props) => {
@@ -13,8 +13,9 @@ const ChatDetailPage = async ({ params }: Props) => {
   if (!session) notFound();
   const userId = session.user.id;
 
+  const { id } = await params;
   const chat = await prisma.chat.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: {
       sender: { select: { id: true, name: true, image: true } },
       receiver: { select: { id: true, name: true, image: true } },

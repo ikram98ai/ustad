@@ -4,7 +4,7 @@ import { Table } from "@radix-ui/themes";
 import Link from "next/link";
 import React from "react";
 import NextLink from "next/link";
-import { Order, OrderStatus } from "@prisma/client";
+import { Order, OrderStatus } from "@/prisma/models";
 
 export interface OrderQuery {
   status: OrderStatus;

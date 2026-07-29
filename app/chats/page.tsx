@@ -85,3 +85,5 @@ export const metadata = {
 };
 
 export default ChatsPage;
+
+export const dynamic = "force-dynamic";

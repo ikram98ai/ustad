@@ -1,10 +1,10 @@
 import prisma from "@/prisma/client";
-import { Notification, NotificationType } from "@prisma/client";
+import { Notification, NotificationType } from "@/prisma/models";
 import type { Server } from "socket.io";
 
 declare global {
   // Set by server.js — API routes share its process under the custom server.
-  // eslint-disable-next-line no-var
+   
   var io: Server | undefined;
 }
 

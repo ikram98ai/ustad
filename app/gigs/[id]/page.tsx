@@ -1,6 +1,7 @@
 import prisma from "@/prisma/client";
 import { Box, Flex, Grid } from "@radix-ui/themes";
 import { notFound } from "next/navigation";
+import GigOrder from "@/app/gigs/_components/GigOrder";
 import ChatButton from "./ChatButton";
 import EditGigButton from "./EditGigButton";
 import GigDetails from "./GigDetails";
@@ -10,17 +11,24 @@ import { cache } from "react";
 import authOptions from "@/app/auth/authOptions";
 
 interface Props {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 const fetchGig = cache((gigId: string) =>
-  prisma.gig.findUnique({ where: { id: gigId } })
+  prisma.gig.findUnique({
+    where: { id: gigId },
+    include: {
+      profession: { select: { title: true } },
+      user: { select: { name: true, image: true } },
+    },
+  })
 );
 
 const GigDetailPage = async ({ params }: Props) => {
   const session = await getServerSession(authOptions);
 
-  const gig = await fetchGig(params.id);
+  const { id } = await params;
+  const gig = await fetchGig(id);
 
   if (!gig) notFound();
 
@@ -38,7 +46,10 @@ const GigDetailPage = async ({ params }: Props) => {
                 <DeleteGigButton gigId={gig.id} />
               </>
             ) : (
-              <ChatButton receiverId={gig.userId} />
+              <>
+                <GigOrder gigId={gig.id} />
+                <ChatButton receiverId={gig.userId} />
+              </>
             )}
           </Flex>
         </Box>
@@ -48,7 +59,8 @@ const GigDetailPage = async ({ params }: Props) => {
 };
 
 export async function generateMetadata({ params }: Props) {
-  const gig = await fetchGig(params.id);
+  const { id } = await params;
+  const gig = await fetchGig(id);
 
   return {
     title: gig?.title,

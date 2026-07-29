@@ -1,8 +1,10 @@
-const { createServer } = require("http");
-const next = require("next");
-const { Server } = require("socket.io");
-const { PrismaClient } = require("@prisma/client");
-const { decode } = require("next-auth/jwt");
+import "dotenv/config";
+import { createServer } from "node:http";
+import next from "next";
+import { decode } from "next-auth/jwt";
+import { Server } from "socket.io";
+import prisma from "./prisma/client";
+import type { Chat, Message } from "./prisma/generated/client";
 
 const dev = process.env.NODE_ENV !== "production";
 const hostname = process.env.HOSTNAME || "localhost";
@@ -10,12 +12,11 @@ const port = parseInt(process.env.PORT || "3000", 10);
 
 const app = next({ dev, hostname, port });
 const handler = app.getRequestHandler();
-const prisma = new PrismaClient();
 
 const MAX_MESSAGE_LENGTH = 5000;
 
-const parseCookies = (header = "") =>
-  header.split(";").reduce((cookies, part) => {
+const parseCookies = (header = ""): Record<string, string> =>
+  header.split(";").reduce<Record<string, string>>((cookies, part) => {
     const index = part.indexOf("=");
     if (index === -1) return cookies;
     cookies[part.slice(0, index).trim()] = decodeURIComponent(
@@ -24,16 +25,16 @@ const parseCookies = (header = "") =>
     return cookies;
   }, {});
 
-const userRoom = (userId) => `user:${userId}`;
-const chatRoom = (chatId) => `chat:${chatId}`;
+const userRoom = (userId: string) => `user:${userId}`;
+const chatRoom = (chatId: string) => `chat:${chatId}`;
 
-const isParticipant = (chat, userId) =>
+const isParticipant = (chat: Chat, userId: string) =>
   chat.senderId === userId || chat.receiverId === userId;
 
 // Persist a MESSAGE notification for a recipient who doesn't have the chat
 // open. Consecutive unread messages from the same chat collapse into one
 // notification that carries the latest text.
-async function notifyMessage(io, message, recipientId) {
+async function notifyMessage(io: Server, message: Message, recipientId: string) {
   const sockets = await io.in(chatRoom(message.chatId)).fetchSockets();
   if (sockets.some((s) => s.data.userId === recipientId)) return;
 
@@ -53,10 +54,27 @@ async function notifyMessage(io, message, recipientId) {
         data: { title, body: message.text, at: new Date() },
       })
     : await prisma.notification.create({
-        data: { userId: recipientId, type: "MESSAGE", title, body: message.text, link },
+        data: {
+          userId: recipientId,
+          type: "MESSAGE",
+          title,
+          body: message.text,
+          link,
+        },
       });
 
   io.to(userRoom(recipientId)).emit("notification:new", notification);
+}
+
+interface JoinAck {
+  ok: boolean;
+  online?: boolean;
+}
+
+interface SendAck {
+  ok: boolean;
+  message?: Message;
+  error?: string;
 }
 
 app.prepare().then(() => {
@@ -79,11 +97,11 @@ app.prepare().then(() => {
 
       const token = await decode({
         token: sessionToken,
-        secret: process.env.NEXTAUTH_SECRET,
+        secret: process.env.NEXTAUTH_SECRET!,
       });
       if (!token?.id) return next(new Error("Unauthorized"));
 
-      socket.data.userId = token.id;
+      socket.data.userId = String(token.id);
       next();
     } catch (error) {
       next(new Error("Unauthorized"));
@@ -91,14 +109,14 @@ app.prepare().then(() => {
   });
 
   io.on("connection", (socket) => {
-    const userId = socket.data.userId;
+    const userId: string = socket.data.userId;
 
     const wasOffline = !io.sockets.adapter.rooms.has(userRoom(userId));
     socket.join(userRoom(userId));
     if (wasOffline)
       socket.broadcast.emit("presence:update", { userId, online: true });
 
-    socket.on("chat:join", async (chatId, ack) => {
+    socket.on("chat:join", async (chatId, ack?: (res: JoinAck) => void) => {
       try {
         const chat = await prisma.chat.findUnique({
           where: { id: String(chatId) },
@@ -130,7 +148,7 @@ app.prepare().then(() => {
       });
     });
 
-    socket.on("message:send", async (payload, ack) => {
+    socket.on("message:send", async (payload, ack?: (res: SendAck) => void) => {
       try {
         const chatId = String(payload?.chatId ?? "");
         const text = String(payload?.text ?? "").trim();

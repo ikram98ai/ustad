@@ -1,21 +1,16 @@
 import React from "react";
 import prisma from "@/prisma/client";
 import { notFound } from "next/navigation";
-import dynamic from "next/dynamic";
-import GigFormSkeleton from "./loading";
-
-const GigForm = dynamic(() => import("@/app/gigs/_components/GigForm"), {
-  ssr: false,
-  loading: () => <GigFormSkeleton />,
-});
+import GigForm from "@/app/gigs/_components/GigFormLazy";
 
 interface Props {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 const EditGigPage = async ({ params }: Props) => {
+  const { id } = await params;
   const gig = await prisma.gig.findUnique({
-    where: { id: params.id },
+    where: { id },
   });
 
   if (!gig) notFound();

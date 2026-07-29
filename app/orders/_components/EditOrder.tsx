@@ -2,7 +2,7 @@
 import { ErrorMessage, Spinner } from "@/app/components";
 import { patchOrderSchema } from "@/app/validationSchemas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { JobType, Order } from "@prisma/client";
+import { JobType, Order } from "@/prisma/models";
 import {
   Button,
   Dialog,
@@ -17,7 +17,7 @@ import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { Pencil2Icon } from "@radix-ui/react-icons";
 
 type OrderFormData = z.infer<typeof patchOrderSchema>;
@@ -62,14 +62,12 @@ const EditOrder = ({ order }: { order: Order }) => {
           <form className="space-y-3" onSubmit={onSubmit}>
             <Flex gap="3">
               <Box>
-                <TextField.Root>
-                  <TextField.Input
-                    pattern="^\d*(\.\d{0,2})?$"
-                    defaultValue={order.rate}
-                    placeholder="Rate"
-                    {...register("rate")}
-                  />
-                </TextField.Root>
+                <TextField.Root
+                  pattern="^\d*(\.\d{0,2})?$"
+                  defaultValue={order.rate}
+                  placeholder="Rate"
+                  {...register("rate")}
+                />
                 <ErrorMessage>{errors.rate?.message}</ErrorMessage>
               </Box>
               <Box>
@@ -109,14 +107,13 @@ const EditOrder = ({ order }: { order: Order }) => {
                   Cancel
                 </Button>
               </Dialog.Close>
-              <Button type="submit" disabled={isSubmitting}>
+              <Button highContrast type="submit" disabled={isSubmitting}>
                 {"Edit Order"} {isSubmitting && <Spinner />}
               </Button>
             </Flex>
           </form>
         </Dialog.Content>
       </Dialog.Root>
-      <Toaster />
     </>
   );
 };

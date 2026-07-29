@@ -6,11 +6,11 @@ import authOptions from "@/app/auth/authOptions";
 import { cache } from "react";
 import OrderDetails from "./OrderDetails";
 import ChangeOrderStatusButton from "./ChangeOrderStatusButton";
-import { OrderStatus } from "@prisma/client";
+import { OrderStatus } from "@/prisma/models";
 import EditOrder from "../_components/EditOrder";
 
 interface Props {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 const fetchOrder = cache((orderId: string) =>
@@ -19,7 +19,8 @@ const fetchOrder = cache((orderId: string) =>
 
 const OrderDetailPage = async ({ params }: Props) => {
   const session = await getServerSession(authOptions);
-  const order = await fetchOrder(params.id);
+  const { id } = await params;
+  const order = await fetchOrder(id);
 
   if (!order) notFound();
 
@@ -71,7 +72,8 @@ const OrderDetailPage = async ({ params }: Props) => {
 };
 
 export async function generateMetadata({ params }: Props) {
-  const order = await fetchOrder(params.id);
+  const { id } = await params;
+  const order = await fetchOrder(id);
 
   return {
     title: order?.id,

@@ -1,16 +1,17 @@
 import Pagination from "@/app/components/Pagination";
 import prisma from "@/prisma/client";
-import { OrderStatus } from "@prisma/client";
+import { OrderStatus } from "@/prisma/models";
 import OrderActions from "./OrderActions";
 import OrderTable, { OrderQuery, columnNames } from "./OrderTable";
 import { Flex } from "@radix-ui/themes";
 import { Metadata } from "next";
 
 interface Props {
-  searchParams: OrderQuery;
+  searchParams: Promise<OrderQuery>;
 }
 
-const OrdersPage = async ({ searchParams }: Props) => {
+const OrdersPage = async (props: Props) => {
+  const searchParams = await props.searchParams;
   const statuses = Object.values(OrderStatus);
   const status = statuses.includes(searchParams.status)
     ? searchParams.status

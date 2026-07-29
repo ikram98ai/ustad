@@ -1,9 +1,9 @@
 "use client";
 
-import { OrderStatus } from "@prisma/client";
+import { OrderStatus } from "@/prisma/models";
 import { Select } from "@radix-ui/themes";
 import { useRouter, useSearchParams } from "next/navigation";
-import React from "react";
+import React, { Suspense } from "react";
 
 const statuses: { label: string; value?: OrderStatus }[] = [
   { label: "All" },
@@ -14,16 +14,24 @@ const statuses: { label: string; value?: OrderStatus }[] = [
   { label: "Completed", value: "COMPLETED" },
 ];
 
-const OrderStatusFilter = () => {
+// useSearchParams needs its own Suspense boundary so pages that render this
+// filter can still be statically prerendered.
+const OrderStatusFilter = () => (
+  <Suspense>
+    <OrderStatusFilterInner />
+  </Suspense>
+);
+
+const OrderStatusFilterInner = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   return (
     <Select.Root
-      defaultValue={searchParams.get("status") || ""}
+      defaultValue={searchParams.get("status") || "ALL"}
       onValueChange={(status) => {
         const params = new URLSearchParams();
-        if (status) params.append("status", status);
+        if (status !== "ALL") params.append("status", status);
         if (searchParams.get("orderBy"))
           params.append("orderBy", searchParams.get("orderBy")!);
 
@@ -34,7 +42,7 @@ const OrderStatusFilter = () => {
       <Select.Trigger placeholder="Filter by status..." />
       <Select.Content>
         {statuses.map((status) => (
-          <Select.Item key={status.label} value={status.value || ""}>
+          <Select.Item key={status.label} value={status.value || "ALL"}>
             {status.label}
           </Select.Item>
         ))}

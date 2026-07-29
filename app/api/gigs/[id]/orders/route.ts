@@ -7,7 +7,7 @@ import { notify } from "@/app/lib/notifications";
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({}, { status: 401 });
@@ -15,13 +15,13 @@ export async function POST(
   const body = await request.json();
   const validation = orderSchema.safeParse(body);
   if (!validation.success)
-    return NextResponse.json(validation.error.format(), { status: 400 });
+    return NextResponse.json(validation.error.issues, { status: 400 });
 
   const user = await prisma.user.findUnique({
     where: { email: session.user!.email! },
   });
 
-  const gig = await prisma.gig.findUnique({ where: { id: params.id } });
+  const gig = await prisma.gig.findUnique({ where: { id: (await params).id } });
   if (!gig) return NextResponse.json({ error: "Invalid gig" }, { status: 404 });
 
   const newOrder = await prisma.order.create({
@@ -29,7 +29,7 @@ export async function POST(
       rate: parseFloat(body.rate),
       job_type: body.job_type,
       requirements: body.requirements,
-      gigId: params.id,
+      gigId: (await params).id,
       userId: user!.id,
       endAt: null,
     },

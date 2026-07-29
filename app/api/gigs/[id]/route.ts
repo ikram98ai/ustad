@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({}, { status: 401 });
@@ -15,12 +15,12 @@ export async function PATCH(
 
   const validation = patchGigSchema.safeParse(body);
   if (!validation.success)
-    return NextResponse.json(validation.error.format(), {
+    return NextResponse.json(validation.error.issues, {
       status: 400,
     });
 
   const gig = await prisma.gig.findUnique({
-    where: { id: params.id },
+    where: { id: (await params).id },
   });
   if (!gig) return NextResponse.json({ error: "Invalid gig" }, { status: 404 });
 
@@ -32,6 +32,9 @@ export async function PATCH(
       range: parseFloat(body.range),
       professionId: body.professionId,
       description: body.description,
+      latitude: body.latitude === undefined ? undefined : body.latitude,
+      longitude: body.longitude === undefined ? undefined : body.longitude,
+      address: body.address === undefined ? undefined : body.address || null,
     },
   });
 
@@ -40,13 +43,13 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({}, { status: 401 });
 
   const gig = await prisma.gig.findUnique({
-    where: { id: params.id },
+    where: { id: (await params).id },
   });
 
   if (!gig) return NextResponse.json({ error: "Invalid gig" }, { status: 404 });

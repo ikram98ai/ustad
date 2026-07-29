@@ -1,4 +1,4 @@
-import { OrderStatus } from "@prisma/client";
+import { OrderStatus } from "@/prisma/models";
 import { Badge } from "@radix-ui/themes";
 import React from "react";
 

@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({}, { status: 401 });
@@ -15,12 +15,12 @@ export async function PATCH(
   const body = await request.json();
   const validation = patchOrderSchema.safeParse(body);
   if (!validation.success)
-    return NextResponse.json(validation.error.format(), {
+    return NextResponse.json(validation.error.issues, {
       status: 400,
     });
 
   const order = await prisma.order.findUnique({
-    where: { id: params.id },
+    where: { id: (await params).id },
     include: { gigUser: true },
   });
   if (!order)

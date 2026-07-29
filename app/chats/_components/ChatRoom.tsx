@@ -11,7 +11,7 @@ import {
 } from "@radix-ui/themes";
 import classnames from "classnames";
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { getSocket } from "../socket";
 import { ChatMessage, ChatUser } from "../types";
 
@@ -43,7 +43,9 @@ const ChatRoom = ({
   const [isOnline, setOnline] = useState(false);
   const [isTyping, setTyping] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
-  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  );
 
   const appendMessage = useCallback(
     (message: ChatMessage) =>
@@ -193,26 +195,21 @@ const ChatRoom = ({
 
       <form onSubmit={sendMessage}>
         <Flex gap="2">
-          <Box grow="1">
-            <TextField.Root>
-              <TextField.Input
-                placeholder={
-                  isConnected ? "Type a message..." : "Connecting..."
-                }
-                value={text}
-                onChange={(e) => {
-                  setText(e.target.value);
-                  emitTyping();
-                }}
-              />
-            </TextField.Root>
+          <Box flexGrow="1">
+            <TextField.Root
+              placeholder={isConnected ? "Type a message..." : "Connecting..."}
+              value={text}
+              onChange={(e) => {
+                setText(e.target.value);
+                emitTyping();
+              }}
+            />
           </Box>
           <Button type="submit" disabled={!isConnected || !text.trim()}>
             Send
           </Button>
         </Flex>
       </form>
-      <Toaster />
     </Flex>
   );
 };
