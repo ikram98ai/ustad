@@ -122,11 +122,13 @@ enum NotificationType {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
+  id             String    @id @default(cuid())
+  name           String?
+  email          String?   @unique
+  emailVerified  DateTime?
+  image          String?
+  hashedPassword String?
+  phone          String?   @db.VarChar(32)
   gigs          Gig[]
   orders        Order[]
   senderChats   Chat[]    @relation("senderChats")

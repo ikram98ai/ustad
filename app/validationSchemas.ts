@@ -36,6 +36,24 @@ export const orderSchema = z.object({
   job_type: z.string().min(1, "Rate is required.").max(255),
   requirements: z.string().min(10, "Requirements is required.").max(65535),
 });
+export const signUpSchema = z.object({
+  email: z.email("Enter a valid email address.").max(255),
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters.")
+    .max(100),
+});
+
+export const profileSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters.").max(60),
+  phone: z
+    .string()
+    .regex(/^\+?[0-9\s()-]{7,20}$/, "Enter a valid phone number.")
+    .optional()
+    .or(z.literal("")),
+  image: z.url("Enter a valid image URL.").max(500).optional().or(z.literal("")),
+});
+
 export const chatSchema = z.object({
   receiverId: z.string().min(1, "Receiver id is required.").max(255),
 });
