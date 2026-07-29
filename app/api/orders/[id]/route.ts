@@ -1,4 +1,5 @@
 import authOptions from "@/app/auth/authOptions";
+import { notify } from "@/app/lib/notifications";
 import { patchOrderSchema } from "@/app/validationSchemas";
 import prisma from "@/prisma/client";
 import { getServerSession } from "next-auth";
@@ -20,6 +21,7 @@ export async function PATCH(
 
   const order = await prisma.order.findUnique({
     where: { id: params.id },
+    include: { gigUser: true },
   });
   if (!order)
     return NextResponse.json({ error: "Invalid order" }, { status: 404 });
@@ -33,6 +35,20 @@ export async function PATCH(
       requirements: body.requirements || order.requirements,
     },
   });
+
+  if (body.status && body.status !== order.status) {
+    // Notify whichever party didn't make the change: the gig owner acting on
+    // an order notifies the customer, and vice versa.
+    const gigOwnerId = order.gigUser.userId;
+    const recipientId =
+      session.user.id === order.userId ? gigOwnerId : order.userId;
+    await notify(recipientId, {
+      type: "ORDER",
+      title: `Order ${updatedOrder.status.toLowerCase()}`,
+      body: `Your order on "${order.gigUser.title}" is now ${updatedOrder.status}.`,
+      link: `/orders/${order.id}`,
+    });
+  }
 
   return NextResponse.json(updatedOrder);
 }

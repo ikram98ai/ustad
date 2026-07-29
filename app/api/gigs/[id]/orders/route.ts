@@ -3,6 +3,7 @@ import prisma from "@/prisma/client";
 import { orderSchema } from "../../../../validationSchemas";
 import { getServerSession } from "next-auth";
 import authOptions from "@/app/auth/authOptions";
+import { notify } from "@/app/lib/notifications";
 
 export async function POST(
   request: NextRequest,
@@ -20,6 +21,9 @@ export async function POST(
     where: { email: session.user!.email! },
   });
 
+  const gig = await prisma.gig.findUnique({ where: { id: params.id } });
+  if (!gig) return NextResponse.json({ error: "Invalid gig" }, { status: 404 });
+
   const newOrder = await prisma.order.create({
     data: {
       rate: parseFloat(body.rate),
@@ -30,6 +34,16 @@ export async function POST(
       endAt: null,
     },
   });
+
+  if (gig.userId !== user!.id)
+    await notify(gig.userId, {
+      type: "ORDER",
+      title: "New order request",
+      body: `${user!.name ?? "A customer"} requested an order on "${
+        gig.title
+      }" at $${newOrder.rate} ${newOrder.job_type}.`,
+      link: `/orders/${newOrder.id}`,
+    });
 
   return NextResponse.json(newOrder, { status: 201 });
 }

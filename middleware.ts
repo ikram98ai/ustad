@@ -6,6 +6,7 @@ export const config = {
         '/profile',
         '/gigs/new',
         '/gigs/edit/:id+',
-        '/chats/:path*'
+        '/chats/:path*',
+        '/notifications'
     ]
 }

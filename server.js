@@ -30,9 +30,42 @@ const chatRoom = (chatId) => `chat:${chatId}`;
 const isParticipant = (chat, userId) =>
   chat.senderId === userId || chat.receiverId === userId;
 
+// Persist a MESSAGE notification for a recipient who doesn't have the chat
+// open. Consecutive unread messages from the same chat collapse into one
+// notification that carries the latest text.
+async function notifyMessage(io, message, recipientId) {
+  const sockets = await io.in(chatRoom(message.chatId)).fetchSockets();
+  if (sockets.some((s) => s.data.userId === recipientId)) return;
+
+  const sender = await prisma.user.findUnique({
+    where: { id: message.senderId },
+    select: { name: true },
+  });
+  const link = `/chats/${message.chatId}`;
+  const title = `New message from ${sender?.name ?? "an ustad user"}`;
+
+  const existing = await prisma.notification.findFirst({
+    where: { userId: recipientId, type: "MESSAGE", link, is_read: false },
+  });
+  const notification = existing
+    ? await prisma.notification.update({
+        where: { id: existing.id },
+        data: { title, body: message.text, at: new Date() },
+      })
+    : await prisma.notification.create({
+        data: { userId: recipientId, type: "MESSAGE", title, body: message.text, link },
+      });
+
+  io.to(userRoom(recipientId)).emit("notification:new", notification);
+}
+
 app.prepare().then(() => {
   const httpServer = createServer(handler);
   const io = new Server(httpServer);
+
+  // API routes run in this same process (custom server), so they can push
+  // real-time notifications through globalThis.io — see app/lib/notifications.ts.
+  globalThis.io = io;
 
   // Session strategy is JWT, so the next-auth cookie can be verified here
   // without a database round-trip.
@@ -119,6 +152,10 @@ app.prepare().then(() => {
           .to(userRoom(chat.receiverId))
           .emit("chats:updated", { chatId });
         ack?.({ ok: true, message });
+
+        const recipientId =
+          chat.senderId === userId ? chat.receiverId : chat.senderId;
+        notifyMessage(io, message, recipientId).catch(() => {});
       } catch (error) {
         ack?.({ ok: false, error: "Could not send the message." });
       }

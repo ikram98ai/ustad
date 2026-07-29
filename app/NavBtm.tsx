@@ -3,6 +3,7 @@ import { Avatar } from "@radix-ui/themes";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
+import NotificationBadge from "./components/NotificationBadge";
 
 const NavBtm = () => {
   const currentPath = usePathname();
@@ -11,6 +12,7 @@ const NavBtm = () => {
     { label: "Home", href: "/" },
     { label: "Orders", href: "/orders/list" },
     { label: "Chats", href: "/chats" },
+    { label: "Alerts", href: "/notifications" },
     { label: "Profile", href: "/profile" },
   ];
   return (
@@ -30,6 +32,8 @@ const NavBtm = () => {
               className="cursor-pointer"
               referrerPolicy="no-referrer"
             />
+          ) : link.href === "/notifications" ? (
+            <NotificationBadge />
           ) : (
             link.label
           )}

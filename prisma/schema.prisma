@@ -96,6 +96,26 @@ model Message {
   at       DateTime @default(now())
 }
 
+model Notification {
+  id      String           @id @default(cuid())
+  userId  String
+  user    User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type    NotificationType @default(SYSTEM)
+  title   String           @db.VarChar(255)
+  body    String           @db.Text
+  link    String?          @db.VarChar(255)
+  is_read Boolean          @default(false)
+  at      DateTime         @default(now())
+
+  @@index([userId, is_read])
+}
+
+enum NotificationType {
+  MESSAGE
+  ORDER
+  SYSTEM
+}
+
 model User {
   id            String    @id @default(cuid())
   name          String?
@@ -107,6 +127,7 @@ model User {
   senderChats   Chat[]    @relation("senderChats")
   receiverChats  Chat[]    @relation("receiverChats")
   messages      Message[]
+  notifications Notification[]
   accounts      Account[]
   sessions      Session[]
 }
