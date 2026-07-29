@@ -5,6 +5,7 @@ export const config = {
         '/orders',
         '/profile',
         '/gigs/new',
-        '/gigs/edit/:id+'
+        '/gigs/edit/:id+',
+        '/chats/:path*'
     ]
 }

@@ -1,0 +1,21 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ustad
+      POSTGRES_PASSWORD: ustad
+      POSTGRES_DB: ustad
+    # 5433 on the host because 5432 is commonly taken by other local databases
+    ports:
+      - "5433:5432"
+    volumes:
+      - ustad_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ustad -d ustad"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  ustad_pgdata:

@@ -1,6 +1,7 @@
 import prisma from "@/prisma/client";
 import { Box, Flex, Grid } from "@radix-ui/themes";
 import { notFound } from "next/navigation";
+import ChatButton from "./ChatButton";
 import EditGigButton from "./EditGigButton";
 import GigDetails from "./GigDetails";
 import DeleteGigButton from "./DeleteGigButton";
@@ -31,8 +32,14 @@ const GigDetailPage = async ({ params }: Props) => {
       {session && (
         <Box>
           <Flex direction="column" gap="4">
-            <EditGigButton gigId={gig.id} />
-            <DeleteGigButton gigId={gig.id} />
+            {session.user.id === gig.userId ? (
+              <>
+                <EditGigButton gigId={gig.id} />
+                <DeleteGigButton gigId={gig.id} />
+              </>
+            ) : (
+              <ChatButton receiverId={gig.userId} />
+            )}
           </Flex>
         </Box>
       )}
