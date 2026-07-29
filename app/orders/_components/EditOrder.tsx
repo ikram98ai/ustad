@@ -51,9 +51,9 @@ const EditOrder = ({ order }: { order: Order }) => {
     <>
       <Dialog.Root>
         <Dialog.Trigger>
-          <Button>
+          <Button variant="soft" highContrast>
             <Pencil2Icon />
-            Edit Order
+            Edit order
           </Button>
         </Dialog.Trigger>
 

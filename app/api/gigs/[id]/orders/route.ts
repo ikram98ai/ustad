@@ -24,6 +24,12 @@ export async function POST(
   const gig = await prisma.gig.findUnique({ where: { id: (await params).id } });
   if (!gig) return NextResponse.json({ error: "Invalid gig" }, { status: 404 });
 
+  if (gig.userId === user!.id)
+    return NextResponse.json(
+      { error: "You cannot order your own gig." },
+      { status: 400 }
+    );
+
   const newOrder = await prisma.order.create({
     data: {
       rate: parseFloat(body.rate),
@@ -35,15 +41,14 @@ export async function POST(
     },
   });
 
-  if (gig.userId !== user!.id)
-    await notify(gig.userId, {
-      type: "ORDER",
-      title: "New order request",
-      body: `${user!.name ?? "A customer"} requested an order on "${
-        gig.title
-      }" at $${newOrder.rate} ${newOrder.job_type}.`,
-      link: `/orders/${newOrder.id}`,
-    });
+  await notify(gig.userId, {
+    type: "ORDER",
+    title: "New order request",
+    body: `${user!.name ?? "A customer"} requested an order on "${
+      gig.title
+    }" at $${newOrder.rate} ${newOrder.job_type}.`,
+    link: `/orders/${newOrder.id}`,
+  });
 
   return NextResponse.json(newOrder, { status: 201 });
 }

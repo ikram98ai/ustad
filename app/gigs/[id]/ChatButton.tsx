@@ -7,7 +7,13 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
-const ChatButton = ({ receiverId }: { receiverId: string }) => {
+const ChatButton = ({
+  receiverId,
+  label = "Chat with Ustad",
+}: {
+  receiverId: string;
+  label?: string;
+}) => {
   const router = useRouter();
   const [isLoading, setLoading] = useState(false);
 
@@ -26,8 +32,13 @@ const ChatButton = ({ receiverId }: { receiverId: string }) => {
 
   return (
     <>
-      <Button onClick={startChat} disabled={isLoading}>
-        Chat with Ustad {isLoading && <Spinner />}
+      <Button
+        variant="soft"
+        highContrast
+        onClick={startChat}
+        disabled={isLoading}
+      >
+        {label} {isLoading && <Spinner />}
       </Button>
     </>
   );

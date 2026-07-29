@@ -1,45 +1,38 @@
 import { Skeleton } from "@/app/components";
-import { Table } from "@radix-ui/themes";
-import OrderActions from "./OrderActions";
+import PageContainer from "@/app/components/PageContainer";
 
 const LoadingOrderPage = () => {
-  const orders = [1, 2, 3, 4, 5];
-
   return (
-    <div>
-      <OrderActions />
-      <Table.Root variant="surface">
-        <Table.Header>
-          <Table.Row>
-            <Table.ColumnHeaderCell>Order</Table.ColumnHeaderCell>
-            <Table.ColumnHeaderCell className="hidden md:table-cell">
-              Status
-            </Table.ColumnHeaderCell>
-            <Table.ColumnHeaderCell className="hidden md:table-cell">
-              Created
-            </Table.ColumnHeaderCell>
-          </Table.Row>
-        </Table.Header>
-        <Table.Body>
-          {orders.map((order) => (
-            <Table.Row key={order}>
-              <Table.Cell>
-                <Skeleton />
-                <div className="block md:hidden">
-                  <Skeleton />
-                </div>
-              </Table.Cell>
-              <Table.Cell className="hidden md:table-cell">
-                <Skeleton />
-              </Table.Cell>
-              <Table.Cell className="hidden md:table-cell">
-                <Skeleton />
-              </Table.Cell>
-            </Table.Row>
-          ))}
-        </Table.Body>
-      </Table.Root>
-    </div>
+    <PageContainer className="max-w-3xl">
+      <h1 className="mb-1">Orders</h1>
+      <p className="mb-3 text-sm text-gray-500">
+        Offers you’ve placed and work coming into your gigs.
+      </p>
+      <div className="mb-3 h-9 w-44 animate-pulse rounded-full bg-gray-100" />
+      <div className="mb-3 flex gap-2">
+        {[1, 2, 3, 4].map((i) => (
+          <div
+            key={i}
+            className="h-8 w-24 animate-pulse rounded-full bg-gray-100"
+          />
+        ))}
+      </div>
+      <div className="divide-y divide-gray-100 overflow-hidden rounded-2xl border border-gray-200 bg-white">
+        {[1, 2, 3, 4, 5].map((order) => (
+          <div key={order} className="flex items-center gap-4 px-4 py-3.5">
+            <Skeleton width="2.75rem" height="2.75rem" borderRadius="0.75rem" />
+            <div className="flex-1">
+              <Skeleton width="12rem" />
+              <Skeleton width="55%" />
+            </div>
+            <div className="w-24">
+              <Skeleton />
+              <Skeleton />
+            </div>
+          </div>
+        ))}
+      </div>
+    </PageContainer>
   );
 };
 

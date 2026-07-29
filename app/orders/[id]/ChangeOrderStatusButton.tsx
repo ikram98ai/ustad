@@ -6,15 +6,46 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+type Status = "PENDING" | "CANCELLED" | "REJECTED" | "ACCEPTED" | "COMPLETED";
+
 interface Props {
   orderId: string;
-  status: "PENDING" | "CANCELLED" | "REJECTED" | "ACCEPTED" | "COMPLETED";
-  color: "orange" | "red" | "violet" | "green";
+  status: Status;
+  color: "orange" | "red" | "violet" | "green" | "blue";
 }
+
+const ACTION: Record<Status, { label: string; description: string }> = {
+  ACCEPTED: {
+    label: "Accept order",
+    description:
+      "The order moves to “In progress” and the customer is notified that you’re taking the job.",
+  },
+  REJECTED: {
+    label: "Reject order",
+    description:
+      "The customer will be notified that you declined this request. This cannot be undone.",
+  },
+  CANCELLED: {
+    label: "Cancel order",
+    description:
+      "The ustad will be notified that you withdrew this order. This cannot be undone.",
+  },
+  COMPLETED: {
+    label: "Mark completed",
+    description:
+      "This closes the order as done for both sides. Do this once the work is finished and agreed.",
+  },
+  PENDING: {
+    label: "Reopen order",
+    description: "This puts the order back into the pending state.",
+  },
+};
+
 const ChangeOrderStatusButton = ({ orderId, status, color }: Props) => {
   const router = useRouter();
   const [error, setError] = useState(false);
   const [isChangingStatus, setChangingStatus] = useState(false);
+  const action = ACTION[status];
 
   const changeOrderStatus = async () => {
     try {
@@ -33,25 +64,24 @@ const ChangeOrderStatusButton = ({ orderId, status, color }: Props) => {
       <AlertDialog.Root>
         <AlertDialog.Trigger>
           <Button color={color} disabled={isChangingStatus}>
-            {status.toLowerCase()} Order
+            {action.label}
             {isChangingStatus && <Spinner />}
           </Button>
         </AlertDialog.Trigger>
-        <AlertDialog.Content>
-          <AlertDialog.Title>Confirm {status.toLowerCase()}</AlertDialog.Title>
+        <AlertDialog.Content style={{ maxWidth: 440 }}>
+          <AlertDialog.Title>{action.label}?</AlertDialog.Title>
           <AlertDialog.Description>
-            Are you sure you want to {status.toLowerCase()} this Order? This
-            action cannot be undone.
+            {action.description}
           </AlertDialog.Description>
           <Flex mt="4" gap="3" justify="end">
             <AlertDialog.Cancel>
               <Button variant="soft" color="gray">
-                Cancel
+                Go back
               </Button>
             </AlertDialog.Cancel>
             <AlertDialog.Action>
               <Button color={color} onClick={changeOrderStatus}>
-                {status.toLowerCase()} Order
+                {action.label}
               </Button>
             </AlertDialog.Action>
           </Flex>
@@ -59,9 +89,9 @@ const ChangeOrderStatusButton = ({ orderId, status, color }: Props) => {
       </AlertDialog.Root>
       <AlertDialog.Root open={error}>
         <AlertDialog.Content>
-          <AlertDialog.Title>Error</AlertDialog.Title>
+          <AlertDialog.Title>Something went wrong</AlertDialog.Title>
           <AlertDialog.Description>
-            This Order could not be {status.toLowerCase()}.
+            The order could not be updated. Please try again.
           </AlertDialog.Description>
           <Button
             color="gray"

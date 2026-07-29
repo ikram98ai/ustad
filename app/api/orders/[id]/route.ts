@@ -26,6 +26,42 @@ export async function PATCH(
   if (!order)
     return NextResponse.json({ error: "Invalid order" }, { status: 404 });
 
+  const userId = session.user.id;
+  const isCustomer = order.userId === userId;
+  const isOwner = order.gigUser.userId === userId;
+  if (!isCustomer && !isOwner)
+    return NextResponse.json(
+      { error: "You are not part of this order." },
+      { status: 403 }
+    );
+
+  if (body.status) {
+    // Customers can cancel, gig owners accept/reject (both while pending);
+    // either side can complete an accepted order.
+    const allowedTransitions: Record<string, boolean> = {
+      CANCELLED: isCustomer && order.status === "PENDING",
+      ACCEPTED: isOwner && order.status === "PENDING",
+      REJECTED: isOwner && order.status === "PENDING",
+      COMPLETED: order.status === "ACCEPTED",
+    };
+    if (!allowedTransitions[body.status])
+      return NextResponse.json(
+        { error: "This status change is not allowed." },
+        { status: 403 }
+      );
+  }
+
+  // The offer itself (rate, requirements, job type) belongs to the customer
+  // and is only editable while the order is pending.
+  if (
+    (body.rate || body.requirements || body.job_type) &&
+    (!isCustomer || order.status !== "PENDING")
+  )
+    return NextResponse.json(
+      { error: "Only the customer can edit a pending offer." },
+      { status: 403 }
+    );
+
   const updatedOrder = await prisma.order.update({
     where: { id: order.id },
     data: {
